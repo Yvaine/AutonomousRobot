@@ -55,7 +55,7 @@ public class Odometer implements TimerListener {
 	// constructor
 	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, int INTERVAL, boolean autostart) {
 		
-		this.lightSensor = new EV3ColorSensor(lightPort);
+		// this.lightSensor = new EV3ColorSensor(lightPort);
 		
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
@@ -139,6 +139,14 @@ public class Odometer implements TimerListener {
 			return x;
 		}
 	}
+	
+	public void setX(double newX){
+		x = newX;
+	}
+	
+	public void setY(double newY){
+		y = newY;
+	}
 
 	// return Y value
 	public double getY() {
@@ -174,6 +182,11 @@ public class Odometer implements TimerListener {
 			position[2] = theta;
 		}
 	}
+	
+	public void fixTheta(double angle){
+		this.theta += angle;
+		this.theta %= 360;
+	}
 
 	public double[] getPosition() {
 		synchronized (this) {
@@ -182,7 +195,7 @@ public class Odometer implements TimerListener {
 	}
 	
 	// accessors to motors
-	public EV3LargeRegulatedMotor [] getMotors() {
+	public EV3LargeRegulatedMotor[] getMotors() {
 		return new EV3LargeRegulatedMotor[] {this.leftMotor, this.rightMotor};
 	}
 	public EV3LargeRegulatedMotor getLeftMotor() {

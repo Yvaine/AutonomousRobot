@@ -1,0 +1,18 @@
+
+import lejos.hardware.Button;
+import lejos.hardware.Key;
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.TextLCD;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+
+public class AutonomousRobot {
+	
+	private EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("S1"));
+	private EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("S4"));
+	Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
+	Navigation nav = new Navigation(odom);
+	public static int displayX = 0;
+	public static int displayY = 0;
+	
+	
+}

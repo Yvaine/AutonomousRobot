@@ -1,0 +1,16 @@
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.TextLCD;
+
+public class Display extends Thread {
+	private TextLCD t = LocalEV3.get().getTextLCD();
+	int x = 0;
+	int y = 0;
+	String str ="";
+	
+	public Display(){
+		
+	}
+	
+	
+	
+}
