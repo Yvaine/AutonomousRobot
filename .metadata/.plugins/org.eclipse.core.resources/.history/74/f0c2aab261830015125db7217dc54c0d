@@ -1,0 +1,23 @@
+import lejos.hardware.device.UART;
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.TextLCD;
+
+public class Slave {
+
+	static UART slaveBrick = new UART(LocalEV3.get().getPort("S1"));
+
+	public static TextLCD t = LocalEV3.get().getTextLCD();
+	
+	static void receiveMasterInfo(){
+		
+		byte[] receivedInfo = new byte[3];
+		
+		slaveBrick.read(receivedInfo, 0, 10);
+		
+		String displayString = "RALPH";
+		
+		t.drawString(displayString, 0, 0);
+		
+	}
+	
+}

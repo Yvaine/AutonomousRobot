@@ -1,0 +1,116 @@
+/*
+ * OdometryCorrection.java
+ */
+
+import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.hardware.port.Port;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.SensorMode;
+
+import java.lang.Math;
+
+public class OdometryCorrection extends Thread 
+{
+	
+	private Odometer odometer;
+	private EV3ColorSensor lightSensor;
+	
+	private static final long CORRECTION_PERIOD = 10;
+	private final static int LightThreshold = 28;
+	private final static double sensorDistanceToCenter = 5; //Distance of the sensor to the center
+	private final static Port lightPort =  SensorPort.S1;
+
+
+	// constructor
+	public OdometryCorrection(Odometer odometer) 
+	{
+		this.odometer = odometer;
+		this.lightSensor = new EV3ColorSensor(lightPort);
+	}
+	
+	float setupLightSensor(){
+		SensorMode mode = lightSensor.getRedMode() ;
+		float[] sample = new float[mode.sampleSize()] ;
+		mode.fetchSample(sample, 0);
+		float lightIntensity = sample[0]*100; 
+		
+		return lightIntensity;
+	}
+	
+	double getThetaX(){
+		return Math.sin(odometer.getTheta()*sensorDistanceToCenter);
+	}
+	
+	
+	double getThetaY(){
+		return Math.cos(odometer.getTheta()*sensorDistanceToCenter);
+	}
+	
+	public void run() 
+	{
+		long correctionStart, correctionEnd;
+		// turn red light on
+		lightSensor.setFloodlight(true);  
+
+		
+		
+		while (true) {
+			correctionStart = System.currentTimeMillis();
+			
+			// sensor setup and reading first value
+			float lightIntensity = setupLightSensor();
+			
+			double relativeX , relativeY; 
+			double correctionX = 0.0; 
+			double correctionY = 0.0;
+			
+			//System.out.println("lIGHT MEASURED:" + lightIntensity);
+			// detects a black line
+			if (lightIntensity < LightThreshold){
+				// debugging purporses, notifies us about a black line
+				Sound.beep();
+				
+				//calculate x and y relative to position of sensor
+				relativeY = odometer.getY() + getThetaY();
+				relativeX = odometer.getX() + getThetaX();
+					
+				//calculate the correction for the robot moving in the y direction
+				if (isMovingVertically(odometer.getTheta())){
+					correctionY = 15.24-(relativeY%30.48);
+				}			
+				//calculate the correction for the robot moving in the x direction
+				else {
+					correctionX = 15.24-(relativeX%30.48);	
+				}
+				
+				// set corrections from calculated X's and Y's and add to current X and Y
+				odometer.setY(correctionY + odometer.getY());
+				odometer.setX(correctionX + odometer.getX());
+				}																	
+			correctionEnd = System.currentTimeMillis();
+			if (correctionEnd - correctionStart < CORRECTION_PERIOD) {
+				try {
+					Thread.sleep(CORRECTION_PERIOD
+							- (correctionEnd - correctionStart));
+				} catch (InterruptedException e) {
+					// there is nothing to be done here because it is not
+					// expected that the odometry correction will be
+					// interrupted by another thread
+				}
+			}
+		}
+	}
+	
+	//When the robot has a theta in the range of -45 deg to 45 deg +ve Y
+	//When the robot has a theta in the range of 135 deg to 225 de, -ve Y
+	public boolean isMovingVertically(double theta){
+		if (Math.abs(theta)<45*Math.PI/180  ||  (theta>135*Math.PI/180 && theta<225*Math.PI/180)){
+			return true;
+		}
+		else{ 
+			return false;
+		}
+	}	
+}
