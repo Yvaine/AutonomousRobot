@@ -14,7 +14,7 @@ public class UltrasonicPoller{
 	private int filterControl;
 	
 	//Constructor
-	public UltrasonicPoller()
+	Public UltrasonicPoller()
 	{
 		this.usSensor = new EV3UltrasonicSensor(usPort);
 		this.usValue = usSensor.getMode("Distance");			// usValue provides samples from this instance

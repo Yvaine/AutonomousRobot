@@ -11,7 +11,7 @@ public class USLocalizer {
 	private Odometer odo;
 	private UltrasonicPoller usPoller;
 	private LocalizationType locType;
-	private boolean isInitiallyFacingWall;
+	private boolean isWallClear;
 	private Navigation nav;
 
 	public USLocalizer(Odometer odo, UltrasonicPoller usPoller, LocalizationType locType,
@@ -69,16 +69,13 @@ public class USLocalizer {
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			double avAng = (angleA + angleB) / 2;
-			double correctionAngle;
-
+			double correctionAngle = 225 - avAng;
+			
+		
 			
 			// formula in tutorial:
 			if (angleA > angleB) {
 				angleB += 360;
-				correctionAngle = 225 - avAng;
-			}
-			else{
-				correctionAngle = 45 - avAng;
 			}
 			odo.fixTheta(correctionAngle);
 
@@ -91,10 +88,8 @@ public class USLocalizer {
 			Sound.beepSequence();
 			double y = getFilteredData();
 
-			int robotOffsetToMid = 11;
-			
-			odo.setX(-30 + x + robotOffsetToMid);
-			odo.setY(-30 + y + robotOffsetToMid);
+			odo.setX(-30+x);
+			odo.setY(-30+y);
 			
 			nav.travelTo(0, 0);
 			nav.turnTo(0, true);

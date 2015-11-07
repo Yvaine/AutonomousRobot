@@ -93,8 +93,8 @@ public class USLocalizer {
 
 			int robotOffsetToMid = 11;
 			
-			odo.setX(-30 + x + robotOffsetToMid);
-			odo.setY(-30 + y + robotOffsetToMid);
+			odo.setX(-30+x + robotOffsetToMid);
+			odo.setY(-30+y + robotOffsetToMid);
 			
 			nav.travelTo(0, 0);
 			nav.turnTo(0, true);

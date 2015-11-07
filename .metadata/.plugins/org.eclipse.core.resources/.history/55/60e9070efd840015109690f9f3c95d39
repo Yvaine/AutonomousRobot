@@ -48,7 +48,7 @@ public class Odometer implements TimerListener {
 	private final double southAngle = 270.00;
 	private final double westAngle = 180.00;
 	private EV3ColorSensor lightSensor;
-	// private final static Port lightPort =  SensorPort.S1;
+	private final static Port lightPort =  SensorPort.S1;
 	private final static int lightThreshold = 28;
 	private final static double sensorDistanceToCenter = 5; //Distance of the sensor to the center
 	
@@ -61,8 +61,8 @@ public class Odometer implements TimerListener {
 		this.rightMotor = rightMotor;
 		
 		// default values, modify for your robot
-		this.rightRadius = 2.1;
-		this.leftRadius = 2.1;
+		this.rightRadius = 2.75;
+		this.leftRadius = 2.75;
 		this.width = 15.8;
 		
 		this.x = 0.0;

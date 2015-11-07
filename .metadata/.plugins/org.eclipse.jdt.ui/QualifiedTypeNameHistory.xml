@@ -4,12 +4,20 @@
 <fullyQualifiedTypeName name="lejos.hardware.sensor.SensorMode"/>
 <fullyQualifiedTypeName name="lejos.hardware.sensor.EV3ColorSensor"/>
 <fullyQualifiedTypeName name="lejos.hardware.port.SensorPort"/>
-<fullyQualifiedTypeName name="lejos.hardware.port.Port"/>
-<fullyQualifiedTypeName name="lejos.hardware.ev3.LocalEV3"/>
 <fullyQualifiedTypeName name="lejos.hardware.device.UART"/>
-<fullyQualifiedTypeName name="lejos.hardware.lcd.TextLCD"/>
 <fullyQualifiedTypeName name="java.io.DataOutputStream"/>
 <fullyQualifiedTypeName name="org.jfree.io.IOUtils"/>
 <fullyQualifiedTypeName name="java.nio.charset.CharsetDecoder"/>
 <fullyQualifiedTypeName name="java.nio.charset.Charset"/>
+<fullyQualifiedTypeName name="java.awt.Button"/>
+<fullyQualifiedTypeName name="lejos.hardware.Button"/>
+<fullyQualifiedTypeName name="lejos.hardware.Key"/>
+<fullyQualifiedTypeName name="lejos.hardware.lcd.TextLCD"/>
+<fullyQualifiedTypeName name="lejos.hardware.ev3.LocalEV3"/>
+<fullyQualifiedTypeName name="lejos.hardware.sensor.SensorModes"/>
+<fullyQualifiedTypeName name="lejos.hardware.sensor.EV3UltrasonicSensor"/>
+<fullyQualifiedTypeName name="lejos.hardware.port.Port"/>
+<fullyQualifiedTypeName name="lejos.robotics.SampleProvider"/>
+<fullyQualifiedTypeName name="java.lang.Thread"/>
+<fullyQualifiedTypeName name="lejos.hardware.Sound"/>
 </qualifiedTypeNameHistroy>

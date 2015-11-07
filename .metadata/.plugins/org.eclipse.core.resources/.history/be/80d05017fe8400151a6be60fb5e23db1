@@ -48,7 +48,7 @@ public class Odometer implements TimerListener {
 	private final double southAngle = 270.00;
 	private final double westAngle = 180.00;
 	private EV3ColorSensor lightSensor;
-	// private final static Port lightPort =  SensorPort.S1;
+	private final static Port lightPort =  SensorPort.S1;
 	private final static int lightThreshold = 28;
 	private final static double sensorDistanceToCenter = 5; //Distance of the sensor to the center
 	
