@@ -9,17 +9,15 @@ public class USLocalizer {
 	public static double ROTATION_SPEED = 30;
 
 	private Odometer odo;
-	private SampleProvider usSensor;
-	private float[] usData;
+	private UltrasonicPoller usPoller;
 	private LocalizationType locType;
 	private boolean isWallClear;
 	private Navigation nav;
 
-	public USLocalizer(Odometer odo, SampleProvider usSensor, float[] usData, LocalizationType locType,
+	public USLocalizer(Odometer odo, UltrasonicPoller usPoller, LocalizationType locType,
 			Navigation nav) {
 		this.odo = odo;
-		this.usSensor = usSensor;
-		this.usData = usData;
+		this.usPoller = usPoller;
 		this.locType = locType;
 		this.nav = nav;
 	}
@@ -99,10 +97,7 @@ public class USLocalizer {
 	}
 
 	private float getFilteredData() {
-		usSensor.fetchSample(usData, 0);
-		float distance = usData[0]*100;
-
-		return distance;
+		return usPoller.getFilteredData();
 	}
 
 }

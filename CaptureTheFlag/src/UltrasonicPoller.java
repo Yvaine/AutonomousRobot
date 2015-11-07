@@ -14,7 +14,7 @@ public class UltrasonicPoller{
 	private int filterControl;
 	
 	//Constructor
-	UltrasonicPoller()
+	Public UltrasonicPoller()
 	{
 		this.usSensor = new EV3UltrasonicSensor(usPort);
 		this.usValue = usSensor.getMode("Distance");			// usValue provides samples from this instance
@@ -32,7 +32,7 @@ public class UltrasonicPoller{
 			if(distance > distanceThreshold)
 				distance = distanceThreshold;
 			
-			//filter out spurious 60s
+			//filter out spurious values
 			if(distance == distanceThreshold && filterControl < FILTER_OUT)
 			{
 				filterControl++;

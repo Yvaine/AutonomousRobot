@@ -13,7 +13,6 @@ public class AutonomousRobot {
 	
 	private static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port usPort = LocalEV3.get().getPort("S2");
 
 	public static int displayX = 0;
 	public static int displayY = 0;
@@ -24,13 +23,10 @@ public class AutonomousRobot {
 	public static void main(String[] args){
 		Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
 		Navigation nav = new Navigation(odom);
-		
-		SensorModes usSensor = new EV3UltrasonicSensor(usPort);
-		SampleProvider usValue = usSensor.getMode("Distance");	
-		float[] usData = new float[usValue.sampleSize()];		
+		UltrasonicPoller usPoller = new UltrasonicPoller();
 		
 		odom.start();
-		USLocalizer usLocal = new USLocalizer(odom, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE, nav);
+		USLocalizer usLocal = new USLocalizer(odom, usPoller, USLocalizer.LocalizationType.FALLING_EDGE, nav);
 		usLocal.doLocalization();
 	}
 	
