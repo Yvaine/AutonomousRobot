@@ -4,7 +4,7 @@ import lejos.hardware.lcd.TextLCD;
 public class Display extends Thread {
 	private TextLCD t;
 
-	String strDisplay ="";
+	String strDisplay = "";
 	
 	public Display(){
 		t = LocalEV3.get().getTextLCD();

@@ -1,31 +1,3 @@
-/*
- * File: Odometer.java
- * Written by: Sean Lawlor
- * ECSE 211 - Design Principles and Methods, Head TA
- * Fall 2011
- * Ported to EV3 by: Francois Ouellet Delorme
- * Fall 2015
- * 
- * Class which controls the odometer for the robot
- * 
- * Odometer defines cooridinate system as such...
- * 
- * 					90Deg:pos y-axis
- * 							|
- * 							|
- * 							|
- * 							|
- * 180Deg:neg x-axis------------------0Deg:pos x-axis
- * 							|
- * 							|
- * 							|
- * 							|
- * 					270Deg:neg y-axis
- * 
- * The odometer is initalized to 90 degrees, assuming the robot is facing up the positive y-axis
- * 
- */
-
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -34,25 +6,41 @@ import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.hardware.sensor.SensorMode;
 
-public class Odometer implements TimerListener {
+/**
+ * @author Sean Lawlor
+ * @author Ralph Bou Samra(Java Docs + helper methods)
+ * @version 1.0 Nov 1, 2015
+ * */
 
+public class Odometer implements TimerListener {
+	/**Timer object*/
 	private Timer timer;
-	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	/**Left motor*/
+	private EV3LargeRegulatedMotor leftMotor;
+	/**Right motor*/
+	private EV3LargeRegulatedMotor rightMotor;
+	/**Default timeout period*/
 	private final int DEFAULT_TIMEOUT_PERIOD = 20;
-	private double leftRadius, rightRadius, width;
-	private double x, y, theta;
-	private double[] oldDH, dDH;
-	private double offset; //distance from center of wheels to the wheels motor
-	private final double northAngle = 90.00;
-	private final double eastAngle = 0.00;
-	private final double southAngle = 270.00;
-	private final double westAngle = 180.00;
+	/**Left wheel Radius*/
+	private double leftRadius;
+	/**Right wheel radius*/
+	private double rightRadius;
+	/**Wheel width*/
+	private double width;
+	/**X position of the robot*/
+	private double x;
+	/**Y position of the robot*/
+	private double y;
+	/**Heading of the robot*/
+	private double theta;
+	private double[] oldDH;
+	private double[] dDH;
+	/**Light sensor*/
 	private EV3ColorSensor lightSensor;
 	// private final static Port lightPort =  SensorPort.S1;
-	private final static int lightThreshold = 28;
-	private final static double sensorDistanceToCenter = 5; //Distance of the sensor to the center
 	
 	// constructor
+	/**Constructs an odometer object */
 	public Odometer (EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, int INTERVAL, boolean autostart) {
 		
 		// this.lightSensor = new EV3ColorSensor(lightPort);
@@ -80,15 +68,25 @@ public class Odometer implements TimerListener {
 	}
 	
 	// functions to start/stop the timerlistener
+	/**
+	 * Stops the timer
+	 * */
 	public void stop() {
 		if (this.timer != null)
 			this.timer.stop();
 	}
+	/**
+	 * Starts the timer
+	 * */
 	public void start() {
 		if (this.timer != null)
 			this.timer.start();
 	}
 	
+	/**
+	 * Setup light sensor
+	 * @return lightIntensity collected by the light sensor
+	 * */
 	float setupLightSensor(){
 		SensorMode mode = lightSensor.getRedMode() ;
 		float[] sample = new float[mode.sampleSize()] ;
@@ -102,6 +100,11 @@ public class Odometer implements TimerListener {
 	/*
 	 * Calculates displacement and heading as title suggests
 	 */
+	/**
+	 * Gets the current displacement and heading of the robot
+	 * @param data
+	 *
+	 * */
 	private void getDisplacementAndHeading(double[] data) {
 		int leftTacho, rightTacho;
 		leftTacho = leftMotor.getTachoCount();
@@ -114,6 +117,9 @@ public class Odometer implements TimerListener {
 	/*
 	 * Recompute the odometer values using the displacement and heading changes
 	 */
+	/**
+	 * Recompute the odometer values using the displacement and heading changes
+	 * */
 	public void timedOut() {
 		this.getDisplacementAndHeading(dDH);
 		dDH[0] -= oldDH[0];
@@ -134,28 +140,49 @@ public class Odometer implements TimerListener {
 	
 	
 	// return X value
+	/**
+	 * Get x position of the robot
+	 * @return x
+	 * */
 	public double getX() {
 		synchronized (this) {
 			return x;
 		}
 	}
 	
-	public void setX(double newX){
-		x = newX;
-	}
-	
-	public void setY(double newY){
-		y = newY;
-	}
-
 	// return Y value
+	/**
+	 * Get y position of the robot
+	 * @return y
+	 * */
 	public double getY() {
 		synchronized (this) {
 			return y;
 		}
 	}
+	
+	/**
+	 * Set x position of the robot
+	 * @param new x value
+	 * */
+	public void setX(double newX){
+		x = newX;
+	}
+	
+	/**
+	 * Set y position of the robot
+	 * @param new y value
+	 * */
+	public void setY(double newY){
+		y = newY;
+	}
+
 
 	// return theta value
+	/**
+	 * Gets heading of the robot
+	 * @return theta
+	 * */
 	public double getAng() {
 		synchronized (this) {
 			return theta;
@@ -163,6 +190,11 @@ public class Odometer implements TimerListener {
 	}
 
 	// set x,y,theta
+	/**
+	 * Sets positions if corresponding update is true
+	 * @param position arary containing x, y, and theta
+	 * @param update array of size 3 containing boolean flags indicating updates in x, y, and theta respectively
+	 * */
 	public void setPosition(double[] position, boolean[] update) {
 		synchronized (this) {
 			if (update[0])
@@ -175,6 +207,9 @@ public class Odometer implements TimerListener {
 	}
 
 	// return x,y,theta
+	/**
+	 * Return position of x, y, and theta
+	 * */
 	public void getPosition(double[] position) {
 		synchronized (this) {
 			position[0] = x;
@@ -183,11 +218,19 @@ public class Odometer implements TimerListener {
 		}
 	}
 	
+	/**
+	 * Corrects theta; called by USLocalizer class
+	 * @param angle
+	 * */
 	public void fixTheta(double angle){
 		this.theta += angle;
 		this.theta %= 360;
 	}
 
+	/**
+	 * Return the x, y, and theta values
+	 * @return double array containing x,y, and theta
+	 * */
 	public double[] getPosition() {
 		synchronized (this) {
 			return new double[] { x, y, theta };
@@ -195,16 +238,35 @@ public class Odometer implements TimerListener {
 	}
 	
 	// accessors to motors
+	/**
+	 * Instantiates the motors
+	 * @return array of size 2 containing the left and right motors
+	 * */
 	public EV3LargeRegulatedMotor[] getMotors() {
 		return new EV3LargeRegulatedMotor[] {this.leftMotor, this.rightMotor};
 	}
+	
+	/**
+	 * Gets the left motor
+	 * @return leftMotor
+	 * */
 	public EV3LargeRegulatedMotor getLeftMotor() {
 		return this.leftMotor;
 	}
+	
+	/**
+	 * Gets the right motor
+	 * @return rightMotor
+	 * */
 	public EV3LargeRegulatedMotor getRightMotor() {
 		return this.rightMotor;
 	}
 
+	/**
+	 * Fixes the angle by specified parameter
+	 * @param angle
+	 * @return fixedAngle
+	 * */
 	// static 'helper' methods
 	public static double fixDegAngle(double angle) {
 		if (angle < 0.0)
@@ -213,6 +275,12 @@ public class Odometer implements TimerListener {
 		return angle % 360.0;
 	}
 
+	/**
+	 * Returns angle based on specified range
+	 * @param a
+	 * @param b
+	 * @return fixedAngle
+	 * */
 	public static double minimumAngleFromTo(double a, double b) {
 		double d = fixDegAngle(b - a);
 

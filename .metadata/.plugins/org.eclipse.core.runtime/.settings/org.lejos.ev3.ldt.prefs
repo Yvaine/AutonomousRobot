@@ -1,2 +1,3 @@
 eclipse.preferences.version=1
 ev3Home=/Users/ralphbousamra/Downloads/leJOS_EV3_0.9.0-beta
+run.runAfterUpload=false

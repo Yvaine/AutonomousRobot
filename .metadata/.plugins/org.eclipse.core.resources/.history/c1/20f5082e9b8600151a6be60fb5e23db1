@@ -1,0 +1,20 @@
+package Blockcatcher;
+
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+//import lejos.hardware.port.Port;
+
+public class BlockCatcher {
+	
+	public static boolean canCatch = false;
+	
+	
+	
+	public static void main(String[] args){
+		someMotor.setSpeed(50);
+		while(!canCatch);
+		someMotor.rotate(30);
+		canCatch = false;
+	}
+	
+}

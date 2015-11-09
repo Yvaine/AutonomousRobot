@@ -1,19 +1,42 @@
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
 
+/**
+ * 
+ * @author Ralph Bou Samra
+ * @version 1.0 Nov 1, 2015
+ * 
+ */
+
 public class USLocalizer {
-	public enum LocalizationType {
-		FALLING_EDGE, RISING_EDGE
+	
+
+	 enum LocalizationType {
+		FALLING_EDGE, 
+		RISING_EDGE
 	};
+	
 
+	/**Speed of wheel rotation */
 	public static double ROTATION_SPEED = 30;
-
+	/** Odomter object passed by instantiater of USLocalizer*/
 	private Odometer odo;
+	/** UltrasonicPoller object passed by instantiater of USLocalizer */
 	private UltrasonicPoller usPoller;
+	/** LocalizationType object passed by instantiater of USLocalizer */
 	private LocalizationType locType;
-	private boolean isInitiallyFacingWall;
+	/** Navigation object passed by instantiater of USLocalizer */
 	private Navigation nav;
 
+	
+	/**
+	 * Constructs a USLocalizer with initial field values
+	 * 
+	 * @param odo (required)
+	 * @param usPoller (required)
+	 * @param locType (required)
+	 * @param nav (required)
+	 * */
 	public USLocalizer(Odometer odo, UltrasonicPoller usPoller, LocalizationType locType,
 			Navigation nav) {
 		this.odo = odo;
@@ -22,6 +45,11 @@ public class USLocalizer {
 		this.nav = nav;
 	}
 
+	
+	/**
+	 * Performs ultrasonic localization
+	 * by collecting and processing data from USPoller
+	 * */
 	public void doLocalization() {
 		double angleA, angleB;
 
@@ -44,6 +72,7 @@ public class USLocalizer {
 			// nav.stopMotors();
 			angleA = odo.getAng();
 			Sound.beep();
+			
 			
 			try {
 				Thread.sleep(2000);
@@ -101,6 +130,12 @@ public class USLocalizer {
 		}
 	}
 
+	/**
+	 *	Gets the filtered value of distance collected
+	 *  from the ultrasonic sensor
+	 *  
+	 *  @return distance collected from ultrasonic sensor
+	 * */
 	private float getFilteredData() {
 		return usPoller.getFilteredData();
 	}

@@ -4,6 +4,11 @@ import lejos.hardware.port.Port;
 import lejos.hardware.sensor.*;
 import lejos.robotics.SampleProvider;
 
+
+/**
+ * @author Ralph Bou Samra
+ * @version 1.0 Nov 1, 2015
+ * */
 public class UltrasonicPoller{
 	private static int distanceThreshold = 250;
 	private static final Port usPort = LocalEV3.get().getPort("S1");
@@ -14,6 +19,9 @@ public class UltrasonicPoller{
 	private int filterControl;
 	
 	//Constructor
+	/**
+	 * Constructs an UltrasonicPoller object
+	 * */
 	public UltrasonicPoller()
 	{
 		this.usSensor = new EV3UltrasonicSensor(usPort);
@@ -22,6 +30,10 @@ public class UltrasonicPoller{
 	}
 	
 	//filtered ultrasonic data getter
+	/**
+	 * Gets the filtered data
+	 * @return filteredData
+	 * */
 	public float getFilteredData() {
 		float distance;
 		do{
