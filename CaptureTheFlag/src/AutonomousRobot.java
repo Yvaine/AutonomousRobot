@@ -32,8 +32,8 @@ import lejos.robotics.SampleProvider;
 
 public class AutonomousRobot {
 	
-	private static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	public static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+ 	public static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 
 	public static int displayX = 0;
 	public static int displayY = 0;
@@ -41,11 +41,16 @@ public class AutonomousRobot {
 	
 	
 	@SuppressWarnings("resource")
-	public static void main(String[] args) throws NotBoundException, InterruptedException, IOException{
-		//Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
-		//Navigation nav = new Navigation(odom);
+	public static void main(String[] args){
+		Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
+		Navigation nav = new Navigation(odom);
+		//nav.travelTo(60, 60);
 		//UltrasonicPoller usPoller = new UltrasonicPoller();
 		//LightSensorPoller lsPoller = new LightSensorPoller();
+		odom.start();
+		OdometryCorrection odomCorr = new OdometryCorrection(odom);
+		odomCorr.start();
+		nav.travelTo(0, 100);
 		
 		//odom.start();
 		//USLocalizer usLocal = new USLocalizer(odom, usPoller, USLocalizer.LocalizationType.FALLING_EDGE, nav);
@@ -53,29 +58,27 @@ public class AutonomousRobot {
 		//LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
 		//lsLocalizer.doLocalization();
 		
-		for(int i = 0; i<5; i++){
-		System.out.println("This is robot A working now");
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		}
+		//leftMotor.setSpeed(100);
+		//rightMotor.setSpeed(100);
+		//leftMotor.forward();
+		//rightMotor.forward();
 		
-		
-//		Brick secondBrick = new RemoteEV3("172.20.10.7");
+//
 //		
-//		Port motorPort = secondBrick.getPort("A");
+//		RemoteEV3 secondBrick = new RemoteEV3("172.20.10.7");
+//		RMIRegulatedMotor motor = secondBrick.createRegulatedMotor("C", 'L');
+//		RMIRegulatedMotor secondMotor = secondBrick.createRegulatedMotor("B", 'L');
 //		
-//		RegulatedMotor motor = new EV3LargeRegulatedMotor(motorPort);
-
-		
-		RemoteEV3 secondBrick = new RemoteEV3("172.20.10.7");
-		RMIRegulatedMotor motor = secondBrick.createRegulatedMotor("C", 'L');
-		System.out.println(motor.getSpeed());
-		motor.setSpeed(70);
-		motor.rotate(60);
-		
+//		motor.setSpeed(100);
+//		motor.forward();
+//		secondMotor.setSpeed(100);
+//		secondMotor.forward();
+//		Thread.sleep(5000);
+//		motor.stop(true);
+//		secondMotor.stop(true);
+		System.exit(0);
 	}
+	
+	
+
 }

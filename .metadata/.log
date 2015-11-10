@@ -686,3 +686,97 @@ Caused by: java.net.ConnectException: Operation timed out
 	at sun.rmi.transport.proxy.RMIMasterSocketFactory.createSocket(RMIMasterSocketFactory.java:148)
 	at sun.rmi.transport.tcp.TCPEndpoint.newSocket(TCPEndpoint.java:613)
 	... 11 more
+
+!ENTRY org.eclipse.ui 4 0 2015-11-09 21:17:55.743
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.NullPointerException
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:23:42.050
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:32:40.668
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:32:45.502
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:33:03.231
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:33:09.062
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:41:53.958
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.lejos.ev3.ldt 4 0 2015-11-09 22:41:58.642
+!MESSAGE No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+!STACK 0
+java.lang.Exception: No EV3 Found: java.net.SocketTimeoutException: Receive timed out
+	at org.lejos.ev3.ldt.util.Discover.discover(Discover.java:43)
+	at org.lejos.ev3.ldt.launch.LaunchEV3ConfigDelegate.launch(LaunchEV3ConfigDelegate.java:163)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:885)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:739)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1039)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$8.run(DebugUIPlugin.java:1256)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.ui 4 0 2015-11-10 01:05:59.608
+!MESSAGE Unhandled event loop exception
+!STACK 0
+java.lang.NullPointerException

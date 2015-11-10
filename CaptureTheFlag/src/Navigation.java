@@ -63,6 +63,7 @@ public class Navigation {
 		this.rightMotor.stop();
 	}
 
+	
 	/*
 	 * Float the two motors jointly
 	 */
@@ -84,7 +85,11 @@ public class Navigation {
 			if (minAng < 0)
 				minAng += 360.0;
 			this.turnTo(minAng, false);
-			this.setSpeeds(FAST, FAST);
+			this.setSpeeds(50, 50);
+			
+			System.out.println("X: "+ odometer.getX());
+			System.out.println("Y: " + odometer.getY());
+			System.out.println("Angle: " + odometer.getAng());
 		}
 		this.setSpeeds(0, 0);
 	}
