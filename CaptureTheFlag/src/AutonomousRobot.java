@@ -42,21 +42,25 @@ public class AutonomousRobot {
 	
 	@SuppressWarnings("resource")
 	public static void main(String[] args){
+	
 		Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
 		Navigation nav = new Navigation(odom);
 		//nav.travelTo(60, 60);
-		//UltrasonicPoller usPoller = new UltrasonicPoller();
-		//LightSensorPoller lsPoller = new LightSensorPoller();
+		UltrasonicPoller usPoller = new UltrasonicPoller();
+		LightSensorPoller lsPoller = new LightSensorPoller();
+		
 		odom.start();
-		OdometryCorrection odomCorr = new OdometryCorrection(odom);
-		odomCorr.start();
-		nav.travelTo(0, 100);
+		//OdometryCorrection odomCorr = new OdometryCorrection(odom);
+		//odomCorr.start();
+		//nav.travelTo(0, 100);
 		
 		//odom.start();
-		//USLocalizer usLocal = new USLocalizer(odom, usPoller, USLocalizer.LocalizationType.FALLING_EDGE, nav);
-		//usLocal.doLocalization();
-		//LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
-		//lsLocalizer.doLocalization();
+		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
+		USLocalizer usLocal = new USLocalizer(odom, usPoller, USLocalizer.LocalizationType.FALLING_EDGE, nav);
+		usLocal.doLocalization();
+		LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
+		lsLocalizer.doLocalization();
+		
 		
 		//leftMotor.setSpeed(100);
 		//rightMotor.setSpeed(100);
@@ -76,6 +80,7 @@ public class AutonomousRobot {
 //		Thread.sleep(5000);
 //		motor.stop(true);
 //		secondMotor.stop(true);
+		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
 	}
 	

@@ -38,6 +38,7 @@ public class Odometer implements TimerListener {
 	/**Light sensor*/
 	private EV3ColorSensor lightSensor;
 	// private final static Port lightPort =  SensorPort.S1;
+	private Display display = new Display();
 	
 	// constructor
 	/**Constructs an odometer object */
@@ -49,9 +50,9 @@ public class Odometer implements TimerListener {
 		this.rightMotor = rightMotor;
 		
 		// default values, modify for your robot
-		this.rightRadius = 2.1;
-		this.leftRadius = 2.1;
-		this.width = 15.8;
+		this.rightRadius = 2.05;//2.1
+		this.leftRadius = 2.05;//2.1
+		this.width = 14.2;//15.8
 		
 		this.x = 0.0;
 		this.y = 0.0;
@@ -136,6 +137,11 @@ public class Odometer implements TimerListener {
 
 		oldDH[0] += dDH[0];
 		oldDH[1] += dDH[1];
+		
+		//Display the current x,y,theta values
+		display.print("x",""+this.x, 0);
+		display.print("y",""+this.y, 1);
+		display.print("theta",""+this.theta, 2);
 	}
 	
 	
@@ -273,6 +279,13 @@ public class Odometer implements TimerListener {
 			angle = 360.0 + (angle % 360.0);
 
 		return angle % 360.0;
+	}
+	
+	//get radius or width
+	
+	public double getRadius()
+	{
+		return this.leftRadius;
 	}
 
 	/**

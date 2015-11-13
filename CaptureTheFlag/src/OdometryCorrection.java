@@ -12,6 +12,13 @@ import lejos.hardware.sensor.SensorMode;
 
 import java.lang.Math;
 
+
+/**
+ * 
+ * @author Ralph Bou Samra
+ * @version v1.0
+ * */
+
 public class OdometryCorrection extends Thread {
 
 	private Odometer odometer;
@@ -35,6 +42,9 @@ public class OdometryCorrection extends Thread {
 	SensorMode rightSensorMode;
 	
 	// constructor
+	/**
+	 * Constructs an Odometry Correction object initilaizing the light sensors  
+	 * */
 	public OdometryCorrection(Odometer odometer) {
 		this.odometer = odometer;
 		this.leftLightSensor = new EV3ColorSensor(leftLightPort);
@@ -43,6 +53,11 @@ public class OdometryCorrection extends Thread {
 		rightSensorMode = rightLightSensor.getRedMode();
 	}
 
+	/**
+	 * Collect samples from the right and left light sensors
+	 * @return array of size 2 containing left and right sensor samples
+	 * */
+	
 	float[] fetchLightSensorValues() {
 		
 		float[] leftSample = new float[leftSensorMode.sampleSize()];
@@ -57,14 +72,26 @@ public class OdometryCorrection extends Thread {
 		
 	}
 
+	/**
+	 * Gets theta X
+	 * @return thetaX
+	 * */
 	double getThetaX() {
 		return Math.sin(odometer.getAng() * sensorDistanceToCenter);
 	}
 
+	/**
+	 * Gets theta Y
+	 * @ return thetaY
+	 * */
 	double getThetaY() {
 		return Math.cos(odometer.getAng() * sensorDistanceToCenter);
 	}
 
+	
+	/**
+	 * run() automatically executes when start is called on an OdomteryCorrection object
+	 * */
 	public void run() {
 		long correctionStart, correctionEnd;
 		// turn red light on
@@ -163,6 +190,12 @@ public class OdometryCorrection extends Thread {
 
 	// When the robot has a theta in the range of -45 deg to 45 deg +ve Y
 	// When the robot has a theta in the range of 135 deg to 225 de, -ve Y
+	
+	/**
+	 * isMovingVertically returns whether the robot is going in the y direction instead of the x direction
+	 * @param current theta
+	 * @return true if the robot is in the y direction, false if the robot is in the x direction 
+	 * */
 	public boolean isMovingVertically(double theta) {
 		if (Math.abs(theta) < 45 * Math.PI / 180 || (theta > 135 * Math.PI / 180 && theta < 225 * Math.PI / 180)) {
 			return true;

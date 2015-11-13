@@ -2,16 +2,19 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="fixTheta" key="selection"/>
+		<item value="AutonomousRobot" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="Lab5"/>
+			<item value="goFor"/>
 			<item value="fixTheta"/>
 			<item value="getTheta"/>
 		</list>
 		<list key="replacehistory">
+			<item value="AutonomousRobot"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

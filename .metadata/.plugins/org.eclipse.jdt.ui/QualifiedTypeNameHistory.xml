@@ -20,4 +20,17 @@
 <fullyQualifiedTypeName name="lejos.robotics.SampleProvider"/>
 <fullyQualifiedTypeName name="java.lang.Thread"/>
 <fullyQualifiedTypeName name="lejos.hardware.Sound"/>
+<fullyQualifiedTypeName name="Blockcatcher.BlockCatcher"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RemoteEV3"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RMIRegulatedMotor"/>
+<fullyQualifiedTypeName name="lejos.hardware.ev3.EV3"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RMIRemoteRegulatedMotor"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RMIEV3"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RMIMotorPort"/>
+<fullyQualifiedTypeName name="lejos.hardware.Brick"/>
+<fullyQualifiedTypeName name="lejos.hardware.lcd.LCD"/>
+<fullyQualifiedTypeName name="lejos.hardware.motor.EV3MediumRegulatedMotor"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RemoteMotorPort"/>
+<fullyQualifiedTypeName name="lejos.remote.ev3.RemoteRequestEV3"/>
+<fullyQualifiedTypeName name="lejos.robotics.RegulatedMotor"/>
 </qualifiedTypeNameHistroy>

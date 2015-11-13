@@ -15,4 +15,10 @@ public class Display extends Thread {
 		AutonomousRobot.displayX++;
 		AutonomousRobot.displayY++;
 	}
+	
+	public void print(String str, String content, int row)
+	{
+		t.clear(row);
+		t.drawString(str + ":" + content, 0, row);
+	}
 }

@@ -1,0 +1,131 @@
+import lejos.hardware.Sound;
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.SensorMode;
+
+public class ObjectDetector extends Thread{
+
+	private int distance;
+	private Odometer odometer;
+	private double[] styrofoamCoords;
+	private double[] obstacleCoords;
+	public static boolean isDetected = false; // flag set when any object is
+												// within the field of view of
+												// the US
+	public static boolean isDetectedStyrofoam = false;
+	public static boolean isDetectedObstacle = false;
+
+	public ObjectDetector(Odometer odometer, double[] styrofoamCoords, double[] obstacleCoords) {
+		this.odometer = odometer;
+		this.obstacleCoords = obstacleCoords;
+		this.styrofoamCoords = styrofoamCoords;
+	}
+
+	// fetch Ultrasonic sensor distance and update
+
+	public void processUSData(int distance) {
+
+		this.distance = distance;
+
+		if (distance < 35) {
+			isDetected = true;
+		}
+	}
+
+	// check if block or obstacle and beep accordingly
+
+	public void run() {
+		while (true) {
+			if (isDetected) {
+				while (distance > 5) {
+					continue;
+				}
+				AutonomousRobot.leftMotor.stop();
+				AutonomousRobot.rightMotor.stop();
+				if (isBlock()) {
+					Sound.beep();
+					styrofoamCoords[0] = odometer.getX();
+					styrofoamCoords[1] = odometer.getY();
+
+					isDetected = true;
+					catchBlock();
+					break;
+				} else {
+					Sound.twoBeeps();
+					obstacleCoords[0] = odometer.getX();
+					obstacleCoords[1] = odometer.getY();
+					// Printer.t.drawString("Object detected:", 0, 5);
+					// Printer.t.drawString("Not Block", 0, 6);
+					isDetected = false;
+					break;
+				}
+			}
+		}
+	}
+
+	// catch block
+	public void catchBlock() {
+		// AutonomousRobot.blockCatcherMotor.setSpeed(20);
+		// AutonomousRobot.blockCatcherMotor.rotate(250);
+		AutonomousRobot.rightMotor.setSpeed(100);
+		AutonomousRobot.leftMotor.setSpeed(100);
+		try {
+			Thread.sleep(3000);
+		} catch (Exception e) {
+
+		}
+		try {
+			Thread.sleep(3000);
+		} catch (Exception e) {
+
+		}
+	}
+
+	public boolean isBlock() {
+		int falsePositiveIterator = 0;
+
+		// checks for dark blue
+		for (int i = 0; i < 20; i++) {
+			// SensorMode mode = AutonomousRobot.lightSensor.getRGBMode();
+			// float[] sample = new float[mode.sampleSize()];
+			// mode.fetchSample(sample, 0);
+			if (getMaxIndex(sample) == 2) {
+				continue;
+			}
+			falsePositiveIterator++;
+		}
+		
+		// This was our initial approach. But given that we were only supposed to detect
+		// the dark blue block, we commented our light blue block detector
+		
+		/*
+		SensorMode mode = AutonomousRobot.lightSensor.getColorIDMode();
+		float[] sample = new float[mode.sampleSize()];
+		mode.fetchSample(sample, 0);
+		float lightIndex = sample[0];
+		if (falsePositiveIterator < 8 || Math.floor(lightIndex) == 6) {
+			return true;
+		}
+		*/
+		return false;
+	}
+
+	// fetch maximum index of the array in the rgb values returned by getrgb mode
+	public int getMaxIndex(float[] sample) {
+		int maxIndex = 0;
+		float currentMaxValue = 0;
+		for (int i = 0; i < sample.length; i++) {
+			if (sample[i] > currentMaxValue) {
+				currentMaxValue = sample[i];
+				maxIndex = i;
+			}
+		}
+		return maxIndex;
+	}
+
+	public int readUSDistance() {
+		return this.distance;
+	}
+
+}

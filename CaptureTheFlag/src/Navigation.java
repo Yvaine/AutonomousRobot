@@ -10,12 +10,21 @@
  */
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * @author Sean Lawlor
+ * @author Ralph Bou Samra(Helper methods + Java docs)
+ * @version v1.0 
+ * */
+
 public class Navigation {
 	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
 	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 
+	/**
+	 * Constructs a Navigation object
+	 * */
 	public Navigation(Odometer odo) {
 		this.odometer = odo;
 
@@ -31,6 +40,9 @@ public class Navigation {
 	/*
 	 * Functions to set the motor speeds jointly
 	 */
+	/**
+	 * Sets the speeds as float data type of the left and right motor
+	 * */
 	public void setSpeeds(float lSpd, float rSpd) {
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
@@ -44,6 +56,9 @@ public class Navigation {
 			this.rightMotor.forward();
 	}
 
+	/**
+	 * Sets the speeds as int data type of the left and right motor
+	 * */
 	public void setSpeeds(int lSpd, int rSpd) {
 		this.leftMotor.setSpeed(lSpd);
 		this.rightMotor.setSpeed(rSpd);
@@ -57,7 +72,9 @@ public class Navigation {
 			this.rightMotor.forward();
 	}
 	
-	
+	/**
+	 * Stop left and right motors
+	 * */
 	public void stopMotors(){
 		this.leftMotor.stop();
 		this.rightMotor.stop();
@@ -67,6 +84,10 @@ public class Navigation {
 	/*
 	 * Float the two motors jointly
 	 */
+	/**
+	 * Float the two motors jointly
+	 * */
+	
 	public void setFloat() {
 		this.leftMotor.stop();
 		this.rightMotor.stop();
@@ -78,6 +99,11 @@ public class Navigation {
 	 * TravelTo function which takes as arguments the x and y position in cm Will travel to designated position, while
 	 * constantly updating it's heading
 	 */
+	/**
+	 * Travel to waypoint(x,y)
+	 * @param x
+	 * @param y
+	 * */
 	public void travelTo(double x, double y) {
 		double minAng;
 		while (Math.abs(x - odometer.getX()) > CM_ERR || Math.abs(y - odometer.getY()) > CM_ERR) {
@@ -98,6 +124,12 @@ public class Navigation {
 	 * TurnTo function which takes an angle and boolean as arguments The boolean controls whether or not to stop the
 	 * motors when the turn is completed
 	 */
+	/**
+	 * Turn to specified angle
+	 * @param angle 
+	 * @param stop
+	 * 
+	 * */
 	public void turnTo(double angle, boolean stop) {
 
 		double error = angle - this.odometer.getAng();
@@ -125,6 +157,10 @@ public class Navigation {
 	/*
 	 * Go foward a set distance in cm
 	 */
+	/**
+	 * Go forward in a straight direction for a specified distance
+	 * @param distance
+	 * */
 	public void goForward(double distance) {
 		this.travelTo(Math.cos(Math.toRadians(this.odometer.getAng())) * distance, Math.cos(Math.toRadians(this.odometer.getAng())) * distance);
 
