@@ -27,6 +27,8 @@ public class USLocalizer {
 	private LocalizationType locType;
 	/** Navigation object passed by instantiater of USLocalizer */
 	private Navigation nav;
+	
+	private int robotOffsetToMid = 9;
 
 	
 	/**
@@ -50,6 +52,7 @@ public class USLocalizer {
 	 * Performs ultrasonic localization
 	 * by collecting and processing data from USPoller
 	 * */
+	
 	public void doLocalization() {
 		double angleA, angleB;
 
@@ -66,20 +69,9 @@ public class USLocalizer {
 			while (getFilteredData() < 35);
 			
 			while (getFilteredData() > 35);
-			
-			//nav.stopMotors();
-		
-			// nav.stopMotors();
 			angleA = odo.getAng();
+			nav.stopMotors();
 			Sound.beep();
-			
-			
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			
 			// switch direction and wait until it sees no wall
 			nav.setSpeeds(-70, 70);
@@ -91,10 +83,10 @@ public class USLocalizer {
 				e.printStackTrace();
 			}
 			while (getFilteredData() > 35);
-			//nav.stopMotors();
-
 			angleB = odo.getAng();
+			nav.stopMotors();
 			Sound.beep();
+			
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			double avAng = (angleA + angleB) / 2;
@@ -111,22 +103,31 @@ public class USLocalizer {
 			}
 			odo.fixTheta(correctionAngle);
 
-			nav.stopMotors();
 			nav.turnTo(270, true);
 			Sound.beepSequence();
+			try {
+				Thread.sleep(400); //wait 1 sec
+			} catch (InterruptedException e) {
+			}
 			double x = getFilteredData();
 
 			nav.turnTo(180, true);
 			Sound.beepSequence();
+			try {
+				Thread.sleep(400); //wait 1 sec
+			} catch (InterruptedException e) {
+			}
 			double y = getFilteredData();
-
-			int robotOffsetToMid = 11;
 			
 			odo.setX(-30 + x + robotOffsetToMid);
 			odo.setY(-30 + y + robotOffsetToMid);
 			
 			nav.travelTo(0, 0);
 			nav.turnTo(0, true);
+			try {
+				Thread.sleep(800); //wait 2 sec
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 

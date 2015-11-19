@@ -1,0 +1,18 @@
+
+public class ObstacleAvoidance extends Thread{
+	
+	UltrasonicPoller usPoller;
+	
+	public ObstacleAvoidance(UltrasonicPoller usPoller){
+		this.usPoller = usPoller;
+	}
+	
+	public void avoidObstacles(){
+		
+	}
+	
+	private float getFilteredData() {
+		return usPoller.getFilteredData();
+	}
+	
+}

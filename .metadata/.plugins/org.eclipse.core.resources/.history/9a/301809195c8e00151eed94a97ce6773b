@@ -1,0 +1,21 @@
+
+public class ObstacleAvoidance{
+	
+	UltrasonicPoller usPoller;
+	
+	public ObstacleAvoidance(UltrasonicPoller usPoller){
+		this.usPoller = usPoller;
+	}
+	
+	
+	public void avoidObstacles(){
+		while(true){
+			
+		}
+	}
+	
+	private float getFilteredData() {
+		return usPoller.getFilteredData();
+	}
+	
+}

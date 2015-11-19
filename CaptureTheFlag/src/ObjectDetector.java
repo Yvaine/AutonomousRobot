@@ -50,8 +50,8 @@ public class ObjectDetector extends Thread{
 				while (distance > 5) {
 					continue;
 				}
-				AutonomousRobot.leftMotor.stop();
-				AutonomousRobot.rightMotor.stop();
+				//AutonomousRobot.leftMotor.stop();
+				//AutonomousRobot.rightMotor.stop();
 				if (isBlock()) {
 					Sound.beep();
 					styrofoamCoords[0] = odometer.getX();
@@ -81,8 +81,8 @@ public class ObjectDetector extends Thread{
 	public void catchBlock() {
 		// AutonomousRobot.blockCatcherMotor.setSpeed(20);
 		// AutonomousRobot.blockCatcherMotor.rotate(250);
-		AutonomousRobot.rightMotor.setSpeed(100);
-		AutonomousRobot.leftMotor.setSpeed(100);
+		//AutonomousRobot.rightMotor.setSpeed(100);
+		//AutonomousRobot.leftMotor.setSpeed(100);
 		try {
 			Thread.sleep(3000);
 		} catch (Exception e) {

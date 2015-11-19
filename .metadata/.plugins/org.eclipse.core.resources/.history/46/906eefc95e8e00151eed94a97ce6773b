@@ -1,0 +1,38 @@
+
+public class ObstacleAvoider{
+	
+	
+	
+	public static boolean isAvoidingObstacles = true;
+	private Navigation navigator;
+	private int initialX = -15;
+	private int initialY = -15;
+	private int currentX;
+	private int currentY;
+	private UltrasonicPoller usPoller;
+	private Odometer odometer;
+	
+	public ObstacleAvoider(UltrasonicPoller usPoller, Navigation nav, Odometer odom){
+		this.usPoller = usPoller;
+		this.navigator = nav;
+		this.odometer = odom;
+	}
+	
+	
+	public void avoidObstacles(){
+		currentX = initialX;
+		currentY = initialY;
+		
+		while(true){
+			float distance = getFilteredData();
+			while(distance > 35){
+				
+			}
+		}
+	}
+	
+	private float getFilteredData() {
+		return usPoller.getFilteredData();
+	}
+	
+}

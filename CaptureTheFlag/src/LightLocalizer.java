@@ -11,7 +11,7 @@ public class LightLocalizer {
 	private LightSensorPoller lsPoller;
 	private final float gridLine = 30;	//the light value of gridline
 	private final float ROTATION_SPEED = 50;
-	private double offset = 0.5;	//offset from sensor to the wheel center
+	private double offset = -4;	//offset from sensor to the wheel center
 	
 	
 	/**

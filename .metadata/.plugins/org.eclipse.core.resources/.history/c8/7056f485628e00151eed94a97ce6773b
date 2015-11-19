@@ -1,0 +1,59 @@
+
+public class ObstacleAvoider {
+
+	public static boolean isAvoidingObstacles = true;
+	private Navigation navigator;
+	private int initialX = -15;
+	private int initialY = -15;
+	private int currentX;
+	private int currentY;
+	private UltrasonicPoller usPoller;
+	private Odometer odometer;
+	private final int TILE_SIZE = 30;
+
+	public ObstacleAvoider(UltrasonicPoller usPoller, Navigation nav, Odometer odom) {
+		this.usPoller = usPoller;
+		this.navigator = nav;
+		this.odometer = odom;
+	}
+
+	public void avoidObstacles() {
+		currentX = initialX;
+		currentY = initialY;
+
+		while (true) {
+			float distance = getFilteredData();
+			if (distance > 40) {
+				double currentAngle = odometer.getAng();
+
+				// heading north
+				if (currentAngle > 45.0 && currentAngle < 135.0) {
+					navigator.travelTo(currentX, currentY + TILE_SIZE);
+				}
+
+				// heading east
+				else if (currentAngle < 45.0 && currentAngle > 315.0) {
+					navigator.travelTo(currentX + TILE_SIZE, currentY);
+				}
+
+				// heading west
+				else if (currentAngle > 135.0 && currentAngle < 225.0) {
+					navigator.travelTo(currentX - TILE_SIZE, currentY);
+				}
+
+				// heading south
+				else if (currentAngle > 225 && currentAngle < 315.0) {
+					navigator.travelTo(currentX, currentY - TILE_SIZE);
+				}
+			}
+			else{
+				navigator.turnTo(90, true);
+			}
+		}
+	}
+
+	private float getFilteredData() {
+		return usPoller.getFilteredData();
+	}
+
+}
