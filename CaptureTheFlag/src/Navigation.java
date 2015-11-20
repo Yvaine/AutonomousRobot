@@ -13,7 +13,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation {
 	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
-	final static double DEG_ERR = 1.0, CM_ERR = 1.0;
+	final static double DEG_ERR = 1.0, CM_ERR = 3.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private float travelSpeed = 100;
@@ -63,6 +63,7 @@ public class Navigation {
 	public void stopMotors(){
 		this.setSpeeds(0, 0);
 	}
+
 	
 	/*
 	 * Float the two motors jointly
@@ -79,45 +80,39 @@ public class Navigation {
 	 * constantly updating it's heading
 	 */
 	public void travelTo(double x, double y) {
-		turnTo(90, true);
-		
-//		double currentX = odometer.getX();
-//		double currentY = odometer.getY();
-//		
-//		double angleToTurn = Math.atan2(y, x);
-//		
-//		System.out.println(angleToTurn + "");
-//		
-//		turnTo(angleToTurn, true);
-//		
-//		this.setSpeeds(travelSpeed, travelSpeed);
-//		
-//		while(currentX<x || currentY<y){
-//			currentX = odometer.getX();
-//			currentY = odometer.getY();
-//		}
-//		this.setSpeeds(0, 0);
+		double minAng;
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
+		this.turnTo(minAng, true);
+		Sound.beepSequence();
+		this.leftMotor.setSpeed(travelSpeed);
+		this.rightMotor.setSpeed(travelSpeed);
+		double distance = Math.sqrt(Math.pow(odometer.getX() - x,2) + Math.pow(odometer.getY() - y, 2));
+		this.leftMotor.rotate(convertDistance(2.1, distance), true);
+		this.rightMotor.rotate(convertDistance(2.1, distance), false);
+
+		//this.setSpeeds(0, 0);
 	}
 
 	/*
 	 * TurnTo function which takes an angle and boolean as arguments The boolean controls whether or not to stop the
 	 * motors when the turn is completed
 	 */
-	
-	
 	public void turnTo(double angle, boolean stop) {
 		double error = angle - this.odometer.getAng();
 		
 		error = (error + 360)%360;
+		display.print("Error Angle: ", error + "", 7);
 		
-		leftMotor.rotate(convertAngle(2.1, 12, error), true);
-		rightMotor.rotate(-convertAngle(2.1, 12, error), false);
+		leftMotor.rotate(-convertAngle(2.1, 14.2, error), true);
+		rightMotor.rotate(convertAngle(2.1, 14.2, error), false);
+
 	
 		if (stop) {
 			this.setSpeeds(0, 0);
 		}
 	}
-
+	
+	
 
 	private static int convertAngle(double radius, double width, double angle) {
 		return convertDistance(radius, Math.PI * width * angle / 360.0);
