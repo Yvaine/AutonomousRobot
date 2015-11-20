@@ -25,6 +25,10 @@ import lejos.remote.ev3.RemoteRequestEV3;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.SampleProvider;
 
+import wifi.StartCorner;
+import wifi.Transmission;
+import wifi.WifiConnection;
+
 /**
  * @author Ralph Bou Samra
  * @version 1.0 Nov 1, 2015
@@ -37,6 +41,12 @@ public class AutonomousRobot {
 
 	public static int displayX = 0;
 	public static int displayY = 0;
+	
+	//for retrieving transmission info
+	private static final String SERVER_IP = "192.168.10.112";
+	private static final int TEAM_NUMBER = 2;
+	
+	static StartCorner corner;
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
@@ -47,17 +57,64 @@ public class AutonomousRobot {
 		//UltrasonicPoller usPoller = new UltrasonicPoller();
 		//LightSensorPoller lsPoller = new LightSensorPoller();
 
+		/*corner ID correction part 1
+		//receive transmission
+		WifiConnection conn = null;
+		try {
+		  conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+		} catch (IOException e) {
+		  LCD.drawString("Connection failed", 0, 8);
+		}
+		 
+		Transmission t = conn.getTransmission();
+		  
+		if (t == null) {
+			LCD.drawString("Failed to read transmission", 0, 5);
+		} 		  
+		//initialization of coords can be moved if needed
+		else {
+			corner = t.startingCorner;
+			int homeZoneBL_X = t.homeZoneBL_X;
+			int homeZoneBL_Y = t.homeZoneBL_Y;
+			int opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+			int opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+			int dropZone_X = t.dropZone_X;
+			int dropZone_Y = t.dropZone_Y;
+			int flagType = t.flagType;
+			int opponentFlagType = t.opponentFlagType;
+		}*/	 
+	 
 		odom.start();
 		//OdometryCorrection odomCorr = new OdometryCorrection(odom);
 		//odomCorr.start();
 		
 		
-		 //USLocalizer usLocal = new USLocalizer(odom, usPoller,
-		 //USLocalizer.LocalizationType.FALLING_EDGE, nav);
-		 //usLocal.doLocalization();
-		 //LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
-		 //lsLocalizer.doLocalization();
-
+		//USLocalizer usLocal = new USLocalizer(odom, usPoller,
+		//USLocalizer.LocalizationType.FALLING_EDGE, nav);
+		//usLocal.doLocalization();
+		//LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
+		//lsLocalizer.doLocalization();
+		
+		/*corner ID correction pt 2
+		//after localization is complete, change position and heading to match
+		//actual corner value
+		//ID 2:coordinate (10,0) & heading 90
+		if (corner.getId() == 2){
+			odom.setPosition(new double[]{10-odom.getY(),odom.getX(),odom.getAng()+90}, 
+					new boolean[]{true, true, true});
+		}
+		//ID 3: coordinate (10,10) & heading 180
+		else if (corner.getId() == 3){
+			odom.setPosition(new double[]{10-odom.getX(),10-odom.getY(),odom.getAng()+180}, 
+					new boolean[]{true, true, true});
+		}
+		//ID 4: cordinate (0,10) & heading 270
+		else if (corner.getId() == 4){
+			odom.setPosition(new double[]{10-odom.getY(),10-odom.getX(),odom.getAng()+270}, 
+					new boolean[]{true, true, true});
+		}
+		*/
+		
 		 
 		// Thread.sleep(2000);
 		
@@ -97,8 +154,7 @@ public class AutonomousRobot {
 		} else {
 			System.out.println("Second brick is null!");
 		}*/
-		while (Button.waitForAnyPress() != Button.ID_ESCAPE)
-			;
+		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);
 	}
 	
