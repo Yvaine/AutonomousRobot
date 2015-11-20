@@ -47,6 +47,20 @@ public class AutonomousRobot {
 	private static final int TEAM_NUMBER = 2;
 	
 	static StartCorner corner;
+	static int homeZoneBL_X;
+	static int homeZoneBL_Y;
+	static int homeZoneTR_X;
+	static int homeZoneTR_Y;
+	static int opponentHomeZoneBL_X;
+	static int opponentHomeZoneBL_Y;
+	static int opponentHomeZoneTR_X;
+	static int opponentHomeZoneTR_Y;
+	static int dropZone_X;
+	static int dropZone_Y;
+	static int flagType;
+	static int opponentFlagType;
+	
+	static boolean ireceived = false;
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
@@ -57,7 +71,7 @@ public class AutonomousRobot {
 		//UltrasonicPoller usPoller = new UltrasonicPoller();
 		//LightSensorPoller lsPoller = new LightSensorPoller();
 
-		/*corner ID correction part 1
+		
 		//receive transmission
 		WifiConnection conn = null;
 		try {
@@ -70,19 +84,23 @@ public class AutonomousRobot {
 		  
 		if (t == null) {
 			LCD.drawString("Failed to read transmission", 0, 5);
-		} 		  
-		//initialization of coords can be moved if needed
+		}
+		//values not needed for demo have been commented out
 		else {
 			corner = t.startingCorner;
-			int homeZoneBL_X = t.homeZoneBL_X;
-			int homeZoneBL_Y = t.homeZoneBL_Y;
-			int opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-			int opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
-			int dropZone_X = t.dropZone_X;
-			int dropZone_Y = t.dropZone_Y;
-			int flagType = t.flagType;
-			int opponentFlagType = t.opponentFlagType;
-		}*/	 
+			//homeZoneBL_X = t.homeZoneBL_X;
+			//homeZoneBL_Y = t.homeZoneBL_Y;
+			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
+			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
+			//dropZone_X = t.dropZone_X;
+			//dropZone_Y = t.dropZone_Y;
+			//flagType = t.flagType;
+			opponentFlagType = t.opponentFlagType;
+			ireceived = true;
+			conn.printTransmission();
+		}
 	 
 		odom.start();
 		//OdometryCorrection odomCorr = new OdometryCorrection(odom);
@@ -96,21 +114,21 @@ public class AutonomousRobot {
 		//lsLocalizer.doLocalization();
 		
 		/*corner ID correction pt 2
-		//after localization is complete, change position and heading to match
-		//actual corner value
+		//after localization is complete, change position and heading to match actual corner value
+		//coordinate should be 10*30cm = 300
 		//ID 2:coordinate (10,0) & heading 90
 		if (corner.getId() == 2){
-			odom.setPosition(new double[]{10-odom.getY(),odom.getX(),odom.getAng()+90}, 
+			odom.setPosition(new double[]{300-odom.getY(),odom.getX(),odom.getAng()+90}, 
 					new boolean[]{true, true, true});
 		}
 		//ID 3: coordinate (10,10) & heading 180
 		else if (corner.getId() == 3){
-			odom.setPosition(new double[]{10-odom.getX(),10-odom.getY(),odom.getAng()+180}, 
+			odom.setPosition(new double[]{300-odom.getX(),300-odom.getY(),odom.getAng()+180}, 
 					new boolean[]{true, true, true});
 		}
 		//ID 4: cordinate (0,10) & heading 270
 		else if (corner.getId() == 4){
-			odom.setPosition(new double[]{10-odom.getY(),10-odom.getX(),odom.getAng()+270}, 
+			odom.setPosition(new double[]{300-odom.getY(),300-odom.getX(),odom.getAng()+270}, 
 					new boolean[]{true, true, true});
 		}
 		*/
