@@ -1,6 +1,7 @@
 
 /*
  * OdometryCorrection.java
+ * edditor : Jiaao Guan
  */
 
 import lejos.hardware.Button;
@@ -22,35 +23,26 @@ import java.lang.Math;
 public class OdometryCorrection extends Thread {
 
 	private Odometer odometer;
-	private EV3ColorSensor leftLightSensor;
-	private EV3ColorSensor rightLightSensor;
+	private LightSensorPoller lsPoller;
 	
-	private static final long CORRECTION_PERIOD = 10;
-	private final static int LightThreshold = 28;
-	private final static double sensorDistanceToCenter = 5; // Distance of the
+	public static boolean odometryWorking = false;
+	private boolean correctionON;
+	private static final long CORRECTION_PERIOD = 100;
+	private final static int LightThreshold = 40;
+	private final static int TILE_WIDTH = 30;
+	private final static int HALF_TILE = TILE_WIDTH/2;
+	private final static double sensorDistanceToCenter = -6; // Distance of the
 															// sensor to the
 															// center
-	private final static Port leftLightPort = SensorPort.S2;
-	private final static Port rightLightPort = SensorPort.S3;
-	
-	
-	private final double northAngle = 90.00;
-	private final double eastAngle = 0.00;
-	private final double southAngle = 270.00;
-	private final double westAngle = 180.00;
-	SensorMode leftSensorMode;
-	SensorMode rightSensorMode;
 	
 	// constructor
 	/**
 	 * Constructs an Odometry Correction object initilaizing the light sensors  
 	 * */
-	public OdometryCorrection(Odometer odometer) {
+	public OdometryCorrection(Odometer odometer, LightSensorPoller lsPoller) {
 		this.odometer = odometer;
-		this.leftLightSensor = new EV3ColorSensor(leftLightPort);
-		this.rightLightSensor = new EV3ColorSensor(rightLightPort);
-		leftSensorMode = leftLightSensor.getRedMode();
-		rightSensorMode = rightLightSensor.getRedMode();
+		this.lsPoller = lsPoller;
+		this.correctionON = true;
 	}
 
 	/**
@@ -58,20 +50,7 @@ public class OdometryCorrection extends Thread {
 	 * @return array of size 2 containing left and right sensor samples
 	 * */
 	
-	float[] fetchLightSensorValues() {
-		
-		float[] leftSample = new float[leftSensorMode.sampleSize()];
-		leftSensorMode.fetchSample(leftSample, 0);
-		float leftLightIntensity = leftSample[0] * 100;
-
-		float[] rightSample = new float[rightSensorMode.sampleSize()];
-		rightSensorMode.fetchSample(rightSample, 0);
-		float rightLightIntensity = rightSample[0] * 100;
-		
-		return new float[]{leftLightIntensity, rightLightIntensity};
-		
-	}
-
+	
 	/**
 	 * Gets theta X
 	 * @return thetaX
@@ -87,93 +66,62 @@ public class OdometryCorrection extends Thread {
 	double getThetaY() {
 		return Math.cos(odometer.getAng() * sensorDistanceToCenter);
 	}
-
+	
+	//the class running controllers
+	
+	//stop correction
+	public void stopCOrrection()
+	{
+		this.correctionON = false;
+	}
 	
 	/**
 	 * run() automatically executes when start is called on an OdomteryCorrection object
 	 * */
-	public void run() {
+	public void doCorrection() {
 		long correctionStart, correctionEnd;
-		// turn red light on
-		leftLightSensor.setFloodlight(true);
-		rightLightSensor.setFloodlight(true);
-		float[] lightIntensity = fetchLightSensorValues();
-		float leftLightIntensity = lightIntensity[0];
-		float rightLightIntensity = lightIntensity[1];
-		while (true) {
+		//correctionON = true;
+		
 			correctionStart = System.currentTimeMillis();
-
-			
-			
 			
 			// the robot is in a diagonal position with a positive slope
-			if(leftLightIntensity < LightThreshold){
-					Sound.beepSequence();
-					odometer.getLeftMotor().stop();
+			
+				if(lsPoller.getLColorRed() < LightThreshold){
+					odometryWorking = true;
+					odometer.getLeftMotor().stop(true);
+	
 					
-					while(rightLightIntensity > LightThreshold){
-						rightLightIntensity = fetchLightSensorValues()[1];
-					}
-					odometer.getRightMotor().stop();
+					while(lsPoller.getRColorRed() > LightThreshold);
+					odometer.getRightMotor().stop(true);
 					
-					double xActual = odometer.getX() + Math.cos(odometer.getAng() * sensorDistanceToCenter);
-					double yActual = odometer.getY() + Math.sin(odometer.getAng() * sensorDistanceToCenter);
+					calculateCorrection();	
+					odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
+					odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
+//					correctionON = false;
 				
-					double errorX = xActual % 30.48;
-					double errorY = yActual % 30.48;
-
-					
-					odometer.setPosition(new double[]{xActual + errorX,  yActual + errorY, 90.0}, new boolean[] {
-							true, true, true});
-					
-					
-					leftLightIntensity = fetchLightSensorValues()[0];
 			}
-			
-			leftLightIntensity = fetchLightSensorValues()[0];
-			
 			// the robot is in a diagonal position with a negative slope
-			if(rightLightIntensity < LightThreshold){
+			else if(lsPoller.getRColorRed() < LightThreshold){
+				//Sound.beepSequence();
+				odometryWorking = true;
+				odometer.getRightMotor().stop();
 				
+				while(lsPoller.getLColorRed() > LightThreshold);
+				odometer.getLeftMotor().stop();
+				
+				calculateCorrection();
+				
+				odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
+				odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
+				
+				
+				//odometer.getLeftMotor().forward();
+				//odometer.getRightMotor().forward();
+//				correctionON = false;
 			}
-			
-			
-//			if (lightIntensity < LightThreshold) {
-//
-//				double xActual = odometer.getX() + Math.cos(odometer.getAng() * sensorDistanceToCenter);
-//				double yActual = odometer.getY() + Math.sin(odometer.getAng() * sensorDistanceToCenter);
-//
-//				double errorX = xActual % 30.48;
-//				double errorY = yActual % 30.48;
-//
-//				double orientationAngle = odometer.getAng();
-//
-//				// North Direction
-//				if (orientationAngle > 45 && orientationAngle < 135) {
-//					odometer.setPosition(
-//							new double[] { errorX + odometer.getX(), errorY + odometer.getY(), northAngle },
-//							new boolean[] { false, true, true });
-//				}
-//
-//				// East Direction
-//				if (orientationAngle < 45 && orientationAngle > 315) {
-//					odometer.setPosition(new double[] { errorX + odometer.getX(), errorY + odometer.getY(), eastAngle },
-//							new boolean[] { true, false, true });
-//				}
-//
-//				// South Direction
-//				if (orientationAngle < 315 && orientationAngle > 225) {
-//					odometer.setPosition(
-//							new double[] { errorX + odometer.getX(), errorY + odometer.getY(), southAngle },
-//							new boolean[] { false, true, true });
-//				}
-//
-//				// West Direction
-//				if (orientationAngle < 225 && orientationAngle > 135) {
-//					odometer.setPosition(new double[] { errorX + odometer.getX(), errorY + odometer.getY(), westAngle },
-//							new boolean[] { true, false, true });
-//				}
 
+			
+			
 				correctionEnd = System.currentTimeMillis();
 				if (correctionEnd - correctionStart < CORRECTION_PERIOD) {
 					try {
@@ -185,8 +133,39 @@ public class OdometryCorrection extends Thread {
 					}
 				}
 			}
-		}
+		
 	
+	
+	private static int convertDistance(double radius, double distance) {
+		return (int)((distance*180.0)/(Math.PI*radius));
+	}
+	
+	//calculate the correction and correct the odometer
+	private void calculateCorrection()
+	{
+		double error;
+		int direction = (((int)odometer.getAng()+45)%360)/90;	//0,1,2,3 means E,N,W,S respectively
+		if(direction < 2)
+			error = (odometer.getY()+ sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+		else
+			error = (odometer.getY()- sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+		//double errorX = 30*Math.sin(odometer.getAng() - direction*90);
+		
+		boolean[] XYTheta = new boolean[3];
+		switch(direction)
+		{
+			case 0:	XYTheta = new boolean[]{true, false, true};
+					break;
+			case 1:	XYTheta = new boolean[]{false, true, true};
+					break;
+			case 2:	XYTheta = new boolean[]{true, false, true};
+					break;
+			case 3:	XYTheta = new boolean[]{false, true, true};
+					break;
+		}
+		
+		odometer.setPosition(new double[]{odometer.getX() + error,  odometer.getY() + error, 90*direction}, XYTheta);
+	}
 
 	// When the robot has a theta in the range of -45 deg to 45 deg +ve Y
 	// When the robot has a theta in the range of 135 deg to 225 de, -ve Y

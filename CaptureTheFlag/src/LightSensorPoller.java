@@ -16,19 +16,19 @@ import lejos.robotics.SampleProvider;
 
 public class LightSensorPoller{
 	/**The left color sensor port*/
-	//private static final Port lColorPort = LocalEV3.get().getPort("S2");		//The port for left light sensor
+	private static final Port lColorPort = LocalEV3.get().getPort("S2");		//The port for left light sensor
 	/**The right color sensor port*/
 	private static final Port rColorPort = LocalEV3.get().getPort("S3");		//The port for right light sensor
 	/**The front color sensor port*/
 	//private static final Port fColorPort = LocalEV3.get().getPort("S4");		//The port for front light sensor
 	/**The left color sensor mode*/
-	//private static SensorModes lColorSensor = new EV3ColorSensor(lColorPort);	// The corresponding SensorModes
+	private static SensorModes lColorSensor = new EV3ColorSensor(lColorPort);	// The corresponding SensorModes
 	/**The right color sensor mode*/
 	private static SensorModes rColorSensor = new EV3ColorSensor(rColorPort);
 	/**The front color sensor mode*/
 	//private static SensorModes fColorSensor = new EV3ColorSensor(fColorPort);
 	/**The left sensor red mode sample provider*/
-	//private SampleProvider lColorRed;
+	private SampleProvider lColorRed;
 	/**The right sensor red mode sample provider*/
 	private SampleProvider rColorRed;
 	/**The front sensor colorID sample provider*/
@@ -49,11 +49,11 @@ public class LightSensorPoller{
 	 * appropriate samples*/
 	public LightSensorPoller()
 	{
-		//this.lColorRed = lColorSensor.getMode("Red");				// LcolorR provides Red samples from this instance
+		this.lColorRed = lColorSensor.getMode("Red");				// LcolorR provides Red samples from this instance
 		this.rColorRed = rColorSensor.getMode("Red");				// RcolorR provides Red samples from this instance
 		//this.fColorID = fColorSensor.getMode("ColorID");		// FcolorID provides one of the 8 color ID's corresponding integers
 		//this.fColorRGB = fColorSensor.getMode("RGB");			// FcolorRGB provides RGB samples from this instance
-		//this.lColorData = new float[lColorRed.sampleSize()];		//The data buffers
+		this.lColorData = new float[lColorRed.sampleSize()];		//The data buffers
 		this.rColorData = new float[rColorRed.sampleSize()];
 		//this.fColorIDData = new float[fColorID.sampleSize()];
 		//this.fColorData = new float[fColorRGB.sampleSize()];
@@ -92,12 +92,12 @@ public class LightSensorPoller{
 	 * Gets the value collected from the left sensor in red mode
 	 * @return color
 	 * */
-	/*public float getLColorRed()
+	public float getLColorRed()
 	{
 		lColorRed.fetchSample(lColorData, 0);
 		float color = 100*lColorData[0];
 		return color;
-	}*/
+	}
 	
 	//Data getter for the right light sensor
 	// The red color getter

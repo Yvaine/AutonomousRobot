@@ -32,7 +32,7 @@ public class WifiTest {
 	// 1. SERVER_IP: the IP address of the computer running the server application
 	// 2. TEAM_NUMBER: your project team number
 	
-	private static final String SERVER_IP = "192.168.10.112";
+	private static final String SERVER_IP = "192.168.10.108";
 	private static final int TEAM_NUMBER = 2;
 	
 	

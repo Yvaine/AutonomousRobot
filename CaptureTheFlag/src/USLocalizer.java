@@ -29,6 +29,8 @@ public class USLocalizer {
 	private Navigation nav;
 	
 	private int robotOffsetToMid = 9;
+	private int distanceA = 35;
+	private int dDistance = 1;
 
 	
 	/**
@@ -52,7 +54,6 @@ public class USLocalizer {
 	 * Performs ultrasonic localization
 	 * by collecting and processing data from USPoller
 	 * */
-	
 	public void doLocalization() {
 		double angleA, angleB;
 
@@ -66,24 +67,28 @@ public class USLocalizer {
 			}
 			
 			nav.setSpeeds(70, -70);
-			while (getFilteredData() < 35);
+			while (getFilteredData() < distanceA);
 			
-			while (getFilteredData() > 35);
+			while (getFilteredData() > distanceA + dDistance);
 			angleA = odo.getAng();
+			while (getFilteredData() > distanceA - dDistance);
+			angleA = 0.5*(odo.getAng() + angleA);
 			nav.stopMotors();
 			Sound.beep();
 			
 			// switch direction and wait until it sees no wall
 			nav.setSpeeds(-70, 70);
-			while (getFilteredData() < 35);
+			while (getFilteredData() < distanceA);
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			while (getFilteredData() > 35);
+			while (getFilteredData() > distanceA + dDistance);
 			angleB = odo.getAng();
+			while (getFilteredData() > distanceA - dDistance);
+			angleB = 0.5*(odo.getAng() + angleB);
 			nav.stopMotors();
 			Sound.beep();
 			
@@ -103,7 +108,7 @@ public class USLocalizer {
 			}
 			odo.fixTheta(correctionAngle);
 
-			nav.turnTo(270, true);
+			nav.turnToLocalization(270, true);
 			Sound.beepSequence();
 			try {
 				Thread.sleep(400); //wait 1 sec
@@ -111,7 +116,7 @@ public class USLocalizer {
 			}
 			double x = getFilteredData();
 
-			nav.turnTo(180, true);
+			nav.turnToLocalization(180, true);
 			Sound.beepSequence();
 			try {
 				Thread.sleep(400); //wait 1 sec
@@ -122,8 +127,8 @@ public class USLocalizer {
 			odo.setX(-30 + x + robotOffsetToMid);
 			odo.setY(-30 + y + robotOffsetToMid);
 			
-			nav.travelTo(0, 0);
-			nav.turnTo(0, true);
+			//nav.travelTo(0, 0);
+			nav.turnToLocalization(0, true);
 			try {
 				Thread.sleep(800); //wait 2 sec
 			} catch (InterruptedException e) {

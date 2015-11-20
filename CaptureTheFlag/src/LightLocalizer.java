@@ -9,8 +9,9 @@ public class LightLocalizer {
 	private Odometer odo;
 	private Navigation navi;
 	private LightSensorPoller lsPoller;
-	private final float gridLine = 30;	//the light value of gridline
+	private final float gridLine = 40;	//the light value of gridline
 	private final float ROTATION_SPEED = 50;
+	private final static int TILE_WIDTH = 30;
 	private double offset = -4;	//offset from sensor to the wheel center
 	
 	
@@ -28,7 +29,7 @@ public class LightLocalizer {
 	 * */
 	public void doLocalization() {
 
-		navi.travelTo(-10, -10);
+		//navi.travelTo(-10, -10);
 		navi.turnTo(90, true);
 		Sound.beep();
 		
@@ -38,15 +39,15 @@ public class LightLocalizer {
 		}
 		
 		navi.setSpeeds(ROTATION_SPEED,ROTATION_SPEED);
-		while(lsPoller.getRColorRed() > gridLine);
-		odo.setY(-offset);
+		while(lsPoller.getLColorRed() > gridLine);
+		odo.setY(-offset+TILE_WIDTH);
 			
 		navi.goForward(-5);
 		navi.turnTo(0, true);
 		
 		navi.setSpeeds(ROTATION_SPEED,ROTATION_SPEED);
-		while(lsPoller.getRColorRed() > gridLine);
-		odo.setX(-offset);
+		while(lsPoller.getLColorRed() > gridLine);
+		odo.setX(-offset+TILE_WIDTH);
 		
 		navi.stopMotors();
 		Sound.beep();
@@ -57,10 +58,6 @@ public class LightLocalizer {
 		}
 		
 		// when done travel to (0,0) and turn to 0 degrees
-		navi.travelTo(0, 0);
-		Sound.buzz();
-		navi.turnTo(0, true);
-		Sound.beep();
 	}
 
 }

@@ -1,0 +1,137 @@
+/*
+ * File: Navigation.java
+ * Written by: Sean Lawlor
+ * ECSE 211 - Design Principles and Methods, Head TA
+ * Fall 2011
+ * Ported to EV3 by: Francois Ouellet Delorme
+ * Fall 2015
+ * 
+ * Movement control class (turnTo, travelTo, flt, localize)
+ */
+import lejos.hardware.Sound;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+
+public class Navigation {
+	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
+	final static double DEG_ERR = 1.0, CM_ERR = 1.0;
+	private Odometer odometer;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private float travelSpeed = 100;
+	private Display display = new Display();
+	public Navigation(Odometer odo) {
+		this.odometer = odo;
+
+		EV3LargeRegulatedMotor[] motors = this.odometer.getMotors();
+		this.leftMotor = motors[0];
+		this.rightMotor = motors[1];
+
+		// set acceleration
+		this.leftMotor.setAcceleration(ACCELERATION);
+		this.rightMotor.setAcceleration(ACCELERATION);
+	}
+
+	/*
+	 * Functions to set the motor speeds jointly
+	 */
+	public void setSpeeds(float lSpd, float rSpd) {
+		this.leftMotor.setSpeed(lSpd);
+		this.rightMotor.setSpeed(rSpd);
+		if (lSpd < 0)
+			this.leftMotor.backward();
+		else
+			this.leftMotor.forward();
+		if (rSpd < 0)
+			this.rightMotor.backward();
+		else
+			this.rightMotor.forward();
+	}
+
+	public void setSpeeds(int lSpd, int rSpd) {
+		this.leftMotor.setSpeed(lSpd);
+		this.rightMotor.setSpeed(rSpd);
+		if (lSpd < 0)
+			this.leftMotor.backward();
+		else
+			this.leftMotor.forward();
+		if (rSpd < 0)
+			this.rightMotor.backward();
+		else
+			this.rightMotor.forward();
+	}
+	
+	
+	public void stopMotors(){
+		this.setSpeeds(0, 0);
+	}
+	
+	/*
+	 * Float the two motors jointly
+	 */
+	public void setFloat() {
+		this.leftMotor.stop();
+		this.rightMotor.stop();
+		this.leftMotor.flt(true);
+		this.rightMotor.flt(true);
+	}
+
+	/*
+	 * TravelTo function which takes as arguments the x and y position in cm Will travel to designated position, while
+	 * constantly updating it's heading
+	 */
+	public void travelTo(double x, double y) {
+	
+		
+		
+		double angleToTurn = Math.atan2(y, x);
+		
+		angleToTurn = angleToTurn * (Math.PI / 180.0);
+
+		turnTo(angleToTurn, true);
+
+		double distance = Math.sqrt(Math.pow(x - odometer.getX(), 2)+Math.pow(y - odometer.getY(), 2));
+		
+		leftMotor.rotate(convertDistance(2.7, distance), true);
+		rightMotor.rotate(convertDistance(2.7, distance), false);
+		
+		this.setSpeeds(0, 0);
+	}
+
+	/*
+	 * TurnTo function which takes an angle and boolean as arguments The boolean controls whether or not to stop the
+	 * motors when the turn is completed
+	 */
+	
+	
+	public void turnTo(double angle, boolean stop) {
+		double error = angle - this.odometer.getAng();
+		
+		error = (error + 360)%360;
+		
+		leftMotor.rotate(convertAngle(2.1, 15.6, error), true);
+		rightMotor.rotate(-convertAngle(2.1, 12, error), false);
+	
+		if (stop) {
+			this.setSpeeds(0, 0);
+		}
+	}
+
+
+	private static int convertAngle(double radius, double width, double angle) {
+		return convertDistance(radius, Math.PI * width * angle / 360.0);
+	}
+	
+	/*
+	 * Go foward a set distance in cm
+	 */
+	public void goForward(double distance) {
+		leftMotor.setSpeed(travelSpeed);
+		rightMotor.setSpeed(travelSpeed);
+		leftMotor.rotate(convertDistance(odometer.getRadius(),distance),true);
+		rightMotor.rotate(convertDistance(odometer.getRadius(),distance),false);
+	}
+	
+	//convert distance to the necessary amount of angle each wheel needs to rotate
+	private static int convertDistance(double radius, double distance) {
+		return (int)((distance*180.0)/(Math.PI*radius));
+	}
+}

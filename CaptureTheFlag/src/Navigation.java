@@ -1,3 +1,4 @@
+
 /*
  * File: Navigation.java
  * Written by: Sean Lawlor
@@ -12,15 +13,18 @@ import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation {
-	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
+	private OdometryCorrection odomCorrection;
+	final static int FAST = 200, SLOW = 100, ACCELERATION = 6000;
 	final static double DEG_ERR = 1.0, CM_ERR = 3.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
-	private float travelSpeed = 100;
+	private float travelSpeed = 75;
 	private Display display = new Display();
-	public Navigation(Odometer odo) {
-		this.odometer = odo;
+	int switchFlag = 0;
 
+	public Navigation(Odometer odo, OdometryCorrection odomCorrection) {
+		this.odometer = odo;
+		this.odomCorrection = odomCorrection;
 		EV3LargeRegulatedMotor[] motors = this.odometer.getMotors();
 		this.leftMotor = motors[0];
 		this.rightMotor = motors[1];
@@ -58,13 +62,11 @@ public class Navigation {
 		else
 			this.rightMotor.forward();
 	}
-	
-	
-	public void stopMotors(){
+
+	public void stopMotors() {
 		this.setSpeeds(0, 0);
 	}
 
-	
 	/*
 	 * Float the two motors jointly
 	 */
@@ -76,60 +78,131 @@ public class Navigation {
 	}
 
 	/*
-	 * TravelTo function which takes as arguments the x and y position in cm Will travel to designated position, while
-	 * constantly updating it's heading
+	 * TravelTo function which takes as arguments the x and y position in cm
+	 * Will travel to designated position, while constantly updating it's
+	 * heading
 	 */
+
 	public void travelTo(double x, double y) {
-		double minAng;
+
+		double minAng = 0.0;
+
 		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
+		if (minAng < 0) {
+			minAng += 360.0;
+		}
+
+		display.print("MinAng: ", "" + minAng, 7);
+
+		// minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) *
+		// (180.0 / Math.PI);
 		this.turnTo(minAng, true);
 		Sound.beepSequence();
 		this.leftMotor.setSpeed(travelSpeed);
 		this.rightMotor.setSpeed(travelSpeed);
-		double distance = Math.sqrt(Math.pow(odometer.getX() - x,2) + Math.pow(odometer.getY() - y, 2));
-		this.leftMotor.rotate(convertDistance(2.1, distance), true);
-		this.rightMotor.rotate(convertDistance(2.1, distance), false);
+		// double distance = Math.sqrt(Math.pow(odometer.getX() - x,2) +
+		// Math.pow(odometer.getY() - y, 2));
 
-		//this.setSpeeds(0, 0);
+		this.leftMotor.forward();
+		this.rightMotor.forward();
+
+		double value = Math.sqrt(Math.pow(x - odometer.getX(), 2.0) + Math.pow(y - odometer.getY(), 2.0));
+		Display display = new Display();
+		display.print("Dist Trav: ", display + "", 6);
+
+		while (Math.sqrt(Math.pow(x - odometer.getX(), 2.0) + Math.pow(y - odometer.getY(), 2.0)) > 2) {
+			value = Math.sqrt(Math.pow(x - odometer.getX(), 2.0) + Math.pow(y - odometer.getY(), 2.0));
+			display.print("Dist Trav: ", value + "", 6);
+
+			odomCorrection.doCorrection();
+
+			// logic of correction
+
+			this.leftMotor.forward();
+			this.rightMotor.forward();
+
+		}
+
+		// this.leftMotor.rotate(convertDistance(2.1, distance), true);
+		// this.rightMotor.rotate(convertDistance(2.1, distance), false);
+		this.leftMotor.stop(true);
+		this.rightMotor.stop(true);
+		// this.setSpeeds(0, 0);
 	}
 
-	/*
-	 * TurnTo function which takes an angle and boolean as arguments The boolean controls whether or not to stop the
-	 * motors when the turn is completed
-	 */
-	public void turnTo(double angle, boolean stop) {
-		double error = angle - this.odometer.getAng();
-		
-		error = (error + 360)%360;
-		display.print("Error Angle: ", error + "", 7);
-		
-		leftMotor.rotate(-convertAngle(2.1, 14.2, error), true);
-		rightMotor.rotate(convertAngle(2.1, 14.2, error), false);
+	public void travelToLocalization(double x, double y) {
+		double minAng;
+		while (Math.abs(x - odometer.getX()) > CM_ERR || Math.abs(y - odometer.getY()) > CM_ERR) {
+			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
+			if (minAng < 0)
+				minAng += 360.0;
+			this.turnTo(minAng, false);
+			this.setSpeeds(FAST, FAST);
+		}
+		this.setSpeeds(0, 0);
+	}
 
-	
+	public void turnToLocalization(double angle, boolean stop) {
+
+		double error = angle - this.odometer.getAng();
+
+		while (Math.abs(error) > DEG_ERR) {
+
+			error = angle - this.odometer.getAng();
+
+			if (error < -180.0) {
+				this.setSpeeds(-SLOW, SLOW);
+			} else if (error < 0.0) {
+				this.setSpeeds(SLOW, -SLOW);
+			} else if (error > 180.0) {
+				this.setSpeeds(SLOW, -SLOW);
+			} else {
+				this.setSpeeds(-SLOW, SLOW);
+			}
+		}
+
 		if (stop) {
 			this.setSpeeds(0, 0);
 		}
 	}
-	
-	
+
+	/*
+	 * TurnTo function which takes an angle and boolean as arguments The boolean
+	 * controls whether or not to stop the motors when the turn is completed
+	 */
+	public void turnTo(double angle, boolean stop) {
+		// double error = angle - this.odometer.getAng();
+
+		// error = (error + 360)%360;
+
+		// display.print("Error Angle: ", error + "", 7);
+		leftMotor.setSpeed(70);
+		rightMotor.setSpeed(70);
+
+		double angleToTurn = odometer.minimumAngleFromTo(this.odometer.getAng(), angle);
+
+		leftMotor.rotate(-convertAngle(2.1, 14.2, angleToTurn), true);
+		rightMotor.rotate(convertAngle(2.1, 14.2, angleToTurn), false);
+
+	}
 
 	private static int convertAngle(double radius, double width, double angle) {
 		return convertDistance(radius, Math.PI * width * angle / 360.0);
 	}
-	
+
 	/*
 	 * Go foward a set distance in cm
 	 */
 	public void goForward(double distance) {
 		leftMotor.setSpeed(travelSpeed);
 		rightMotor.setSpeed(travelSpeed);
-		leftMotor.rotate(convertDistance(odometer.getRadius(),distance),true);
-		rightMotor.rotate(convertDistance(odometer.getRadius(),distance),false);
+		leftMotor.rotate(convertDistance(odometer.getRadius(), distance), true);
+		rightMotor.rotate(convertDistance(odometer.getRadius(), distance), false);
 	}
-	
-	//convert distance to the necessary amount of angle each wheel needs to rotate
+
+	// convert distance to the necessary amount of angle each wheel needs to
+	// rotate
 	private static int convertDistance(double radius, double distance) {
-		return (int)((distance*180.0)/(Math.PI*radius));
+		return (int) ((distance * 180.0) / (Math.PI * radius));
 	}
 }

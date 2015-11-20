@@ -8,6 +8,7 @@ import lejos.hardware.Brick;
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.LED;
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.lcd.TextLCD;
@@ -41,11 +42,13 @@ public class AutonomousRobot {
 
 	public static int displayX = 0;
 	public static int displayY = 0;
-	
-	//for retrieving transmission info
-	private static final String SERVER_IP = "192.168.10.112";
+
+	// for retrieving transmission info
+	private static final String SERVER_IP = "192.168.10.108";
 	private static final int TEAM_NUMBER = 2;
-	
+
+	private static TextLCD LCD = LocalEV3.get().getTextLCD();
+
 	static StartCorner corner;
 	static int homeZoneBL_X;
 	static int homeZoneBL_Y;
@@ -59,131 +62,123 @@ public class AutonomousRobot {
 	static int dropZone_Y;
 	static int flagType;
 	static int opponentFlagType;
-	
+
 	static boolean ireceived = false;
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
 
-		 Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
-		 Navigation nav = new Navigation(odom);
+		UltrasonicPoller usPoller = new UltrasonicPoller();
+		LightSensorPoller lsPoller = new LightSensorPoller();
+		Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
+		OdometryCorrection corr = new OdometryCorrection(odom, lsPoller);
+		Navigation nav = new Navigation(odom, corr);
 
-		//UltrasonicPoller usPoller = new UltrasonicPoller();
-		//LightSensorPoller lsPoller = new LightSensorPoller();
+		USLocalizer usLocal = new USLocalizer(odom, usPoller, USLocalizer.LocalizationType.FALLING_EDGE, nav);
+		usLocal.doLocalization();
+		LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
+		lsLocalizer.doLocalization();
 
-		
-		//receive transmission
-		WifiConnection conn = null;
-		try {
-		  conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-		} catch (IOException e) {
-		  LCD.drawString("Connection failed", 0, 8);
-		}
-		 
-		Transmission t = conn.getTransmission();
-		  
-		if (t == null) {
-			LCD.drawString("Failed to read transmission", 0, 5);
-		}
-		//values not needed for demo have been commented out
-		else {
-			corner = t.startingCorner;
-			//homeZoneBL_X = t.homeZoneBL_X;
-			//homeZoneBL_Y = t.homeZoneBL_Y;
-			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
-			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
-			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
-			//dropZone_X = t.dropZone_X;
-			//dropZone_Y = t.dropZone_Y;
-			//flagType = t.flagType;
-			opponentFlagType = t.opponentFlagType;
-			ireceived = true;
-			conn.printTransmission();
-		}
-	 
-		odom.start();
-		//OdometryCorrection odomCorr = new OdometryCorrection(odom);
-		//odomCorr.start();
-		
-		
-		//USLocalizer usLocal = new USLocalizer(odom, usPoller,
-		//USLocalizer.LocalizationType.FALLING_EDGE, nav);
-		//usLocal.doLocalization();
-		//LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
-		//lsLocalizer.doLocalization();
-		
-		/*corner ID correction pt 2
-		//after localization is complete, change position and heading to match actual corner value
-		//coordinate should be 10*30cm = 300
-		//ID 2:coordinate (10,0) & heading 90
-		if (corner.getId() == 2){
-			odom.setPosition(new double[]{300-odom.getY(),odom.getX(),odom.getAng()+90}, 
-					new boolean[]{true, true, true});
-		}
-		//ID 3: coordinate (10,10) & heading 180
-		else if (corner.getId() == 3){
-			odom.setPosition(new double[]{300-odom.getX(),300-odom.getY(),odom.getAng()+180}, 
-					new boolean[]{true, true, true});
-		}
-		//ID 4: cordinate (0,10) & heading 270
-		else if (corner.getId() == 4){
-			odom.setPosition(new double[]{300-odom.getY(),300-odom.getX(),odom.getAng()+270}, 
-					new boolean[]{true, true, true});
-		}
-		*/
-		
-		 
-		// Thread.sleep(2000);
-		
-		
-			//leftMotor.rotate(convertAngle(2.1, 15, 90), true);
-			//rightMotor.rotate(-convertAngle(2.1, 15, 90), false);
-		 nav.travelTo(30, 30);
-		 //nav.turnTo(0, true);
-		 
-		
-		 // odom.setPosition(new double[]{0, 0, 0}, new boolean[]{true, true, true});
-		 
-		 
-		// ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom);
+		// ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav,
+		// odom);
 		// obstacleAvoider.avoidObstacles();
-		 
-		 
-		 
+
+		// nav.turnTo(0, true);
+
+		// ObstacleAvoider avoider = new ObstacleAvoider(usPoller, nav, odom);
+		// avoider.avoidObstacles();
+		// nav.travelTo(15, 75);
+		// Thread.sleep(2000);
+		// nav.travelTo(75, 75);
+		// nav.travelTo(75, 15);
+		// nav.travelTo(15, 15);
+		// receive transmission
+
 		/*
-		System.out.println("Master brick will command the slave brick to catch the block now!");
+		 * 
+		 * WifiConnection conn = null; try { conn = new
+		 * WifiConnection(SERVER_IP, TEAM_NUMBER); } catch (IOException e) {
+		 * LCD.drawString("Connection failed", 0, 8); Sound.beepSequence(); }
+		 * 
+		 * Transmission t = conn.getTransmission();
+		 * 
+		 * if (t == null) { LCD.drawString("Failed to read transmission", 0, 5);
+		 * } //values not needed for demo have been commented out else { corner
+		 * = t.startingCorner; //homeZoneBL_X = t.homeZoneBL_X; //homeZoneBL_Y =
+		 * t.homeZoneBL_Y; opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+		 * opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y; opponentHomeZoneTR_X =
+		 * t.opponentHomeZoneTR_X; opponentHomeZoneTR_Y =
+		 * t.opponentHomeZoneTR_Y; //dropZone_X = t.dropZone_X; //dropZone_Y =
+		 * t.dropZone_Y; //flagType = t.flagType; opponentFlagType =
+		 * t.opponentFlagType; ireceived = true; conn.printTransmission(); }
+		 */
 
-		RemoteEV3 secondBrick = null;
-		try {
-			secondBrick = new RemoteEV3("172.20.10.7");
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// OdometryCorrection odomCorr = new OdometryCorrection(odom);
+		// odomCorr.start();
 
-		if (secondBrick != null) {
-			System.out.println("This part works!!!!");
-			RMIRegulatedMotor motor = secondBrick.createRegulatedMotor("B", 'L');
-			RMIRegulatedMotor secondMotor = secondBrick.createRegulatedMotor("C", 'M');
+		// USLocalizer usLocal = new USLocalizer(odom, usPoller,
+		// USLocalizer.LocalizationType.FALLING_EDGE, nav);
+		// usLocal.doLocalization();
+		// LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
+		// lsLocalizer.doLocalization();
 
-			BlockCatcher blockCatcher = new BlockCatcher(motor, secondMotor);
-			blockCatcher.start();
-		} else {
-			System.out.println("Second brick is null!");
-		}*/
-		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
+		/*
+		 * corner ID correction pt 2 //after localization is complete, change
+		 * position and heading to match actual corner value //coordinate should
+		 * be 10*30cm = 300 //ID 2:coordinate (10,0) & heading 90 if
+		 * (corner.getId() == 2){ odom.setPosition(new
+		 * double[]{300-odom.getY(),odom.getX(),odom.getAng()+90}, new
+		 * boolean[]{true, true, true}); } //ID 3: coordinate (10,10) & heading
+		 * 180 else if (corner.getId() == 3){ odom.setPosition(new
+		 * double[]{300-odom.getX(),300-odom.getY(),odom.getAng()+180}, new
+		 * boolean[]{true, true, true}); } //ID 4: cordinate (0,10) & heading
+		 * 270 else if (corner.getId() == 4){ odom.setPosition(new
+		 * double[]{300-odom.getY(),300-odom.getX(),odom.getAng()+270}, new
+		 * boolean[]{true, true, true}); }
+		 */
+
+		// Thread.sleep(2000);
+
+		// leftMotor.rotate(convertAngle(2.1, 15, 90), true);
+		// rightMotor.rotate(-convertAngle(2.1, 15, 90), false);
+		// nav.travelTo(30, 30);
+		// nav.turnTo(0, true);
+
+		// odom.setPosition(new double[]{0, 0, 0}, new boolean[]{true, true,
+		// true});
+
+		// ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav,
+		// odom);
+		// obstacleAvoider.avoidObstacles();
+
+		/*
+		 * System.out.println(
+		 * "Master brick will command the slave brick to catch the block now!");
+		 * 
+		 * RemoteEV3 secondBrick = null; try { secondBrick = new
+		 * RemoteEV3("172.20.10.7"); } catch (RemoteException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); }
+		 * 
+		 * if (secondBrick != null) { System.out.println("This part works!!!!");
+		 * RMIRegulatedMotor motor = secondBrick.createRegulatedMotor("B", 'L');
+		 * RMIRegulatedMotor secondMotor = secondBrick.createRegulatedMotor("C",
+		 * 'M');
+		 * 
+		 * BlockCatcher blockCatcher = new BlockCatcher(motor, secondMotor);
+		 * blockCatcher.start(); } else { System.out.println(
+		 * "Second brick is null!"); }
+		 */
+		while (Button.waitForAnyPress() != Button.ID_ESCAPE)
+			;
 		System.exit(0);
 	}
-	
-	
+
 	private static int convertAngle(double radius, double width, double angle) {
 		return convertDistance(radius, Math.PI * width * angle / 360.0);
 	}
 
-	
 	private static int convertDistance(double radius, double distance) {
-		return (int)((distance*180.0)/(Math.PI*radius));
+		return (int) ((distance * 180.0) / (Math.PI * radius));
 	}
-	
+
 }
