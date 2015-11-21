@@ -44,7 +44,7 @@ public class AutonomousRobot {
 	public static int displayY = 0;
 
 	// for retrieving transmission info
-	private static final String SERVER_IP = "192.168.10.108";
+	private static final String SERVER_IP = "172.20.10.4";
 	private static final int TEAM_NUMBER = 2;
 
 	private static TextLCD LCD = LocalEV3.get().getTextLCD();
@@ -68,6 +68,38 @@ public class AutonomousRobot {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
 
+		WifiConnection conn = null;
+		try {
+			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+		} catch (IOException e) {
+			LCD.drawString("Connection failed", 0, 8);
+			Sound.beepSequence();
+		}
+
+		Transmission t = conn.getTransmission();
+
+		if (t == null) {
+			LCD.drawString("Failed to read transmission", 0, 5);
+		} else {
+			// corner = t.startingCorner;
+			homeZoneBL_X = t.homeZoneBL_X;
+			homeZoneBL_Y = t.homeZoneBL_Y;
+			homeZoneTR_X = t.homeZoneTR_X;
+			homeZoneTR_Y = t.homeZoneTR_Y;
+			
+			// opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+			// opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+			// opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
+			// opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
+			// dropZone_X = t.dropZone_X;
+			// dropZone_Y = t.dropZone_Y;
+			// flagType = t.flagType;
+			// opponentFlagType = t.opponentFlagType;
+			// ireceived = true;
+			// conn.printTransmission();
+		}
+		
+		
 		UltrasonicPoller usPoller = new UltrasonicPoller();
 		LightSensorPoller lsPoller = new LightSensorPoller();
 		Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
@@ -78,13 +110,16 @@ public class AutonomousRobot {
 		usLocal.doLocalization();
 		LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
 		lsLocalizer.doLocalization();
-
-		// ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav,
-		// odom);
-		// obstacleAvoider.avoidObstacles();
-
+		
+		
+		Thread.sleep(2000);
+		
+		nav.travelToLocalization(15, 15);
+		
+		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{homeZoneBL_X, homeZoneBL_Y, homeZoneTR_X, homeZoneTR_Y});
+		obstacleAvoider.avoidObstacles();
+		
 		// nav.turnTo(0, true);
-
 		// ObstacleAvoider avoider = new ObstacleAvoider(usPoller, nav, odom);
 		// avoider.avoidObstacles();
 		// nav.travelTo(15, 75);
@@ -93,25 +128,6 @@ public class AutonomousRobot {
 		// nav.travelTo(75, 15);
 		// nav.travelTo(15, 15);
 		// receive transmission
-
-		/*
-		 * 
-		 * WifiConnection conn = null; try { conn = new
-		 * WifiConnection(SERVER_IP, TEAM_NUMBER); } catch (IOException e) {
-		 * LCD.drawString("Connection failed", 0, 8); Sound.beepSequence(); }
-		 * 
-		 * Transmission t = conn.getTransmission();
-		 * 
-		 * if (t == null) { LCD.drawString("Failed to read transmission", 0, 5);
-		 * } //values not needed for demo have been commented out else { corner
-		 * = t.startingCorner; //homeZoneBL_X = t.homeZoneBL_X; //homeZoneBL_Y =
-		 * t.homeZoneBL_Y; opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-		 * opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y; opponentHomeZoneTR_X =
-		 * t.opponentHomeZoneTR_X; opponentHomeZoneTR_Y =
-		 * t.opponentHomeZoneTR_Y; //dropZone_X = t.dropZone_X; //dropZone_Y =
-		 * t.dropZone_Y; //flagType = t.flagType; opponentFlagType =
-		 * t.opponentFlagType; ireceived = true; conn.printTransmission(); }
-		 */
 
 		// OdometryCorrection odomCorr = new OdometryCorrection(odom);
 		// odomCorr.start();

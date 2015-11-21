@@ -27,7 +27,6 @@
 <fullyQualifiedTypeName name="lejos.remote.ev3.RMIMotorPort"/>
 <fullyQualifiedTypeName name="lejos.hardware.Brick"/>
 <fullyQualifiedTypeName name="lejos.hardware.lcd.LCD"/>
-<fullyQualifiedTypeName name="lejos.hardware.motor.EV3MediumRegulatedMotor"/>
 <fullyQualifiedTypeName name="lejos.remote.ev3.RemoteMotorPort"/>
 <fullyQualifiedTypeName name="lejos.remote.ev3.RemoteRequestEV3"/>
 <fullyQualifiedTypeName name="lejos.robotics.RegulatedMotor"/>
@@ -36,4 +35,6 @@
 <fullyQualifiedTypeName name="lejos.utility.TimerListener"/>
 <fullyQualifiedTypeName name="java.lang.Math"/>
 <fullyQualifiedTypeName name="lejos.hardware.Sound"/>
+<fullyQualifiedTypeName name="OdometryCorrection"/>
+<fullyQualifiedTypeName name="lejos.hardware.motor.EV3MediumRegulatedMotor"/>
 </qualifiedTypeNameHistroy>

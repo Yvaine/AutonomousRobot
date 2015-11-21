@@ -131,15 +131,40 @@ public class Navigation {
 	}
 
 	public void travelToLocalization(double x, double y) {
-		double minAng;
-		while (Math.abs(x - odometer.getX()) > CM_ERR || Math.abs(y - odometer.getY()) > CM_ERR) {
-			minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
-			if (minAng < 0)
-				minAng += 360.0;
-			this.turnTo(minAng, false);
-			this.setSpeeds(FAST, FAST);
+
+		double minAng = 0.0;
+
+		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
+		if (minAng < 0) {
+			minAng += 360.0;
 		}
-		this.setSpeeds(0, 0);
+
+		display.print("MinAng: ", "" + minAng, 7);
+
+		// minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) *
+		// (180.0 / Math.PI);
+		this.turnTo(minAng, true);
+		Sound.beepSequence();
+		this.leftMotor.setSpeed(travelSpeed);
+		this.rightMotor.setSpeed(travelSpeed);
+		// double distance = Math.sqrt(Math.pow(odometer.getX() - x,2) +
+		// Math.pow(odometer.getY() - y, 2));
+
+		this.leftMotor.forward();
+		this.rightMotor.forward();
+
+		double value = Math.sqrt(Math.pow(x - odometer.getX(), 2.0) + Math.pow(y - odometer.getY(), 2.0));
+		Display display = new Display();
+		display.print("Dist Trav: ", display + "", 6);
+
+		while (Math.sqrt(Math.pow(x - odometer.getX(), 2.0) + Math.pow(y - odometer.getY(), 2.0)) > 2) {
+			value = Math.sqrt(Math.pow(x - odometer.getX(), 2.0) + Math.pow(y - odometer.getY(), 2.0));
+			display.print("Dist Trav: ", value + "", 6);
+		}
+		
+		this.leftMotor.stop(true);
+		this.rightMotor.stop(true);
+
 	}
 
 	public void turnToLocalization(double angle, boolean stop) {

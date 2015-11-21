@@ -28,7 +28,7 @@ public class OdometryCorrection extends Thread {
 	public static boolean odometryWorking = false;
 	private boolean correctionON;
 	private static final long CORRECTION_PERIOD = 100;
-	private final static int LightThreshold = 40;
+	private final static int LightThreshold = 36;
 	private final static int TILE_WIDTH = 30;
 	private final static int HALF_TILE = TILE_WIDTH/2;
 	private final static double sensorDistanceToCenter = -6; // Distance of the
