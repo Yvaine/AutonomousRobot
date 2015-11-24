@@ -1,6 +1,6 @@
 /*
  * OdometryCorrection.java
- * Author : Jiaao Guan
+ * edditor : Jiaao Guan
  */
 
 import lejos.hardware.Button;

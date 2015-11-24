@@ -1,6 +1,7 @@
+
 /*
  * OdometryCorrection.java
- * Author : Jiaao Guan
+ * edditor : Jiaao Guan
  */
 
 import lejos.hardware.Button;
@@ -27,10 +28,10 @@ public class OdometryCorrection extends Thread {
 	public static boolean odometryWorking = false;
 	private boolean correctionON;
 	private static final long CORRECTION_PERIOD = 100;
-	private final static int LightThreshold = 40;
+	private final static int LightThreshold = 36;
 	private final static int TILE_WIDTH = 30;
 	private final static int HALF_TILE = TILE_WIDTH/2;
-	private final static double sensorDistanceToCenter = -3.5; // Distance of the
+	private final static double sensorDistanceToCenter = -6; // Distance of the
 															// sensor to the
 															// center
 	
@@ -144,17 +145,11 @@ public class OdometryCorrection extends Thread {
 	{
 		double error;
 		int direction = (((int)odometer.getAng()+45)%360)/90;	//0,1,2,3 means E,N,W,S respectively
-		switch(direction)
-		{
-			case 0:	error = (odometer.getX() + sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
-					break;
-			case 1:	error = (odometer.getY() + sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
-					break;
-			case 2:	error = (odometer.getX()  - sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
-					break;
-			default:	error = (odometer.getY()  - sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
-					break;
-		}
+		if(direction < 2)
+			error = (odometer.getY()+ sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+		else
+			error = (odometer.getY()- sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+		//double errorX = 30*Math.sin(odometer.getAng() - direction*90);
 		
 		boolean[] XYTheta = new boolean[3];
 		switch(direction)
@@ -169,7 +164,7 @@ public class OdometryCorrection extends Thread {
 					break;
 		}
 		
-		odometer.setPosition(new double[]{odometer.getX() - error,  odometer.getY() - error, 90*direction}, XYTheta);
+		odometer.setPosition(new double[]{odometer.getX() + error,  odometer.getY() + error, 90*direction}, XYTheta);
 	}
 
 	// When the robot has a theta in the range of -45 deg to 45 deg +ve Y
