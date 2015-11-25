@@ -102,17 +102,42 @@ public class ObjectDetector extends Thread{
 	 * */
 	public boolean isBlock() {
 		int falsePositiveIterator = 0;
-
-		// checks for dark blue
+		//detects blocks from demo: 5 colors
+		//TODO: this class needs to accept the LSPoller and block ID as input
+		/*
 		for (int i = 0; i < 20; i++) {
+			int ID = ls.getFColorID();
+			//white or light blue detected
+			if (ID == 6) {
+				if(ls.getFColorRGB()[0] < 0.22 && ls.getFColorRGB()[2] >= ls.getFColorRGB()[0]){
+					return true;
+				}
+				return true;
+		    }
+			//red
+			if (ID == 0){
+				return true;
+			}
+			//dark blue
+			if (ID == 2){
+				return true;
+			}
+			//yellow
+			if (ID == 3){
+				return true;
+			}
+		}*/
+		
+		// checks for dark blue
+		//for (int i = 0; i < 20; i++) {
 			// SensorMode mode = AutonomousRobot.lightSensor.getRGBMode();
 			// float[] sample = new float[mode.sampleSize()];
 			// mode.fetchSample(sample, 0);
 			//if (getMaxIndex(sample) == 2) {
 			//	continue;
 		    //	}
-			falsePositiveIterator++;
-		}
+		//	falsePositiveIterator++;
+		//}
 		
 		// This was our initial approach. But given that we were only supposed to detect
 		// the dark blue block, we commented our light blue block detector
