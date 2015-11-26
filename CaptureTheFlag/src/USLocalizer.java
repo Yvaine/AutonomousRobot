@@ -66,7 +66,7 @@ public class USLocalizer {
 				e2.printStackTrace();
 			}
 			
-			nav.setSpeeds(70, -70);
+			nav.setSpeeds(100, -100);
 			while (getFilteredData() < distanceA);
 			
 			while (getFilteredData() > distanceA + dDistance);
@@ -77,7 +77,7 @@ public class USLocalizer {
 			Sound.beep();
 			
 			// switch direction and wait until it sees no wall
-			nav.setSpeeds(-70, 70);
+			nav.setSpeeds(-100, 100);
 			while (getFilteredData() < distanceA);
 			try {
 				Thread.sleep(2000);
@@ -108,7 +108,7 @@ public class USLocalizer {
 			}
 			odo.fixTheta(correctionAngle);
 
-			nav.turnToLocalization(270, true);
+			/*nav.turnToLocalization(270, true);
 			Sound.beepSequence();
 			try {
 				Thread.sleep(400); //wait 1 sec
@@ -126,9 +126,10 @@ public class USLocalizer {
 			
 			odo.setX(-30 + x + robotOffsetToMid);
 			odo.setY(-30 + y + robotOffsetToMid);
+			*/
 			
 			//nav.travelTo(0, 0);
-			nav.turnToLocalization(0, true);
+			//nav.turnToLocalization(0, true);
 			try {
 				Thread.sleep(800); //wait 2 sec
 			} catch (InterruptedException e) {

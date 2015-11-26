@@ -39,7 +39,8 @@ public class AutonomousRobot {
 
 	public static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	public static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-
+	public static float[] samples = new float[10];
+	
 	public static int displayX = 0;
 	public static int displayY = 0;
 
@@ -67,7 +68,7 @@ public class AutonomousRobot {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
-
+/*
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -98,10 +99,11 @@ public class AutonomousRobot {
 			// ireceived = true;
 			// conn.printTransmission();
 		}
-		
+		*/
 		
 		UltrasonicPoller usPoller = new UltrasonicPoller();
 		LightSensorPoller lsPoller = new LightSensorPoller();
+		samples = lsPoller.getSamples();
 		Odometer odom = new Odometer(leftMotor, rightMotor, 30, true);
 		OdometryCorrection corr = new OdometryCorrection(odom, lsPoller);
 		Navigation nav = new Navigation(odom, corr);
@@ -116,10 +118,9 @@ public class AutonomousRobot {
 		
 		nav.travelToLocalization(15, 15);
 		
+		nav.turnTo(0, true);
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{homeZoneBL_X, homeZoneBL_Y, homeZoneTR_X, homeZoneTR_Y});
 		obstacleAvoider.avoidObstacles();
-		
-		// nav.turnTo(0, true);
 		// ObstacleAvoider avoider = new ObstacleAvoider(usPoller, nav, odom);
 		// avoider.avoidObstacles();
 		// nav.travelTo(15, 75);

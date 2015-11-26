@@ -1,6 +1,6 @@
 /*
  * OdometryCorrection.java
- * Author : Jiaao Guan
+ * edditor : Jiaao Guan
  */
 
 import lejos.hardware.Button;
@@ -27,7 +27,7 @@ public class OdometryCorrection extends Thread {
 	public static boolean odometryWorking = false;
 	private boolean correctionON;
 	private static final long CORRECTION_PERIOD = 100;
-	private final static int LightThreshold = 40;
+	private final static int LightThreshold = 55;
 	private final static int TILE_WIDTH = 30;
 	private final static int HALF_TILE = TILE_WIDTH/2;
 	private final static double sensorDistanceToCenter = -3.5; // Distance of the
@@ -69,7 +69,7 @@ public class OdometryCorrection extends Thread {
 	//the class running controllers
 	
 	//stop correction
-	public void stopCOrrection()
+	public void stopCorrection()
 	{
 		this.correctionON = false;
 	}
@@ -85,38 +85,39 @@ public class OdometryCorrection extends Thread {
 			
 			// the robot is in a diagonal position with a positive slope
 			
-				if(lsPoller.getLColorRed() < LightThreshold){
-					odometryWorking = true;
-					odometer.getLeftMotor().stop(true);
-	
-					
-					while(lsPoller.getRColorRed() > LightThreshold);
-					odometer.getRightMotor().stop(true);
-					
-					calculateCorrection();	
-					odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
-					odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
-//					correctionON = false;
+			if(lsPoller.getLColorRed() < AutonomousRobot.samples[0] - 16){
+				odometryWorking = true;
+				odometer.getLeftMotor().stop(true);
+
+				
+				while(lsPoller.getRColorRed() > AutonomousRobot.samples[1] - 16);
+				odometer.getRightMotor().stop(true);
+				
+				calculateCorrection();	
+				odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
+				odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
+				ObstacleAvoider.seekPath();
+				//correctionON = false;
 				
 			}
 			// the robot is in a diagonal position with a negative slope
-			else if(lsPoller.getRColorRed() < LightThreshold){
+			else if(lsPoller.getRColorRed() < AutonomousRobot.samples[1] - 16){
 				//Sound.beepSequence();
 				odometryWorking = true;
-				odometer.getRightMotor().stop();
+				odometer.getRightMotor().stop(true);
 				
-				while(lsPoller.getLColorRed() > LightThreshold);
-				odometer.getLeftMotor().stop();
+				while(lsPoller.getLColorRed() > AutonomousRobot.samples[0] - 16);
+				odometer.getLeftMotor().stop(true);
 				
 				calculateCorrection();
 				
 				odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
 				odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
-				
+				ObstacleAvoider.seekPath();
 				
 				//odometer.getLeftMotor().forward();
 				//odometer.getRightMotor().forward();
-//				correctionON = false;
+				//correctionON = false;
 			}
 
 			
