@@ -29,7 +29,7 @@ public class LightSensorPoller {
 																			// light
 																			// sensor
 	/** The front color sensor port */
-	private static final Port fColorPort = LocalEV3.get().getPort("S4");
+	// private static final Port fColorPort = LocalEV3.get().getPort("S4");
 	// //The port for front light sensor
 	/** The left color sensor mode */
 	private static SensorModes lColorSensor = new EV3ColorSensor(lColorPort); // The
@@ -38,32 +38,32 @@ public class LightSensorPoller {
 	/** The right color sensor mode */
 	private static SensorModes rColorSensor = new EV3ColorSensor(rColorPort);
 	/** The front color sensor mode */
-	private static SensorModes fColorSensor = new EV3ColorSensor(fColorPort);
+	// private static SensorModes fColorSensor = new EV3ColorSensor(fColorPort);
 	/** The left sensor red mode sample provider */
 	private SampleProvider lColorRed;
 	/** The right sensor red mode sample provider */
 	private SampleProvider rColorRed;
 	/** The front sensor colorID sample provider */
-	private SampleProvider fColorID;
+	// private SampleProvider fColorID;
 	/** The front sensor RGB sample provider */
-	private SampleProvider fColorRGB;
+	// private SampleProvider fColorRGB;
 	/** Holds values of sample collected by lColorRed */
 	private float[] lColorData;
 	/** Holds values of sample collected by rColorRed */
 	private float[] rColorData;
 	/** Holds values of sample collected by fColorID */
-	private float[] fColorIDData;
+	// private float[] fColorIDData;
 	/** Holds values of sample collected by fColorData */
-	private float[] fColorData;
+	// private float[] fColorData;
 
-	// left and right colorID mode
+	//left and right colorID mode
 	private SampleProvider lColorID;
 	private SampleProvider rColorID;
 	private SampleProvider lAvg;
 	private SampleProvider rAvg;
 	private float[] lColorIDData;
 	private float[] rColorIDData;
-
+	
 	// Constructor
 	/**
 	 * Constructs a LightSensorPoller, initializes the sample providers, and
@@ -80,50 +80,54 @@ public class LightSensorPoller {
 		// one of the 8 color ID's corresponding integers
 		// this.fColorRGB = fColorSensor.getMode("RGB"); // FcolorRGB provides
 		// RGB samples from this instance
-
+		
 		this.lColorData = new float[lColorRed.sampleSize()]; // The data buffers
 		this.rColorData = new float[rColorRed.sampleSize()];
 		// this.fColorIDData = new float[fColorID.sampleSize()];
 		// this.fColorData = new float[fColorRGB.sampleSize()];
-
+		
 		this.lColorID = lColorSensor.getMode("ColorID");
 		this.rColorID = rColorSensor.getMode("ColorID");
 		this.lColorIDData = new float[lColorID.sampleSize()];
 		this.rColorIDData = new float[rColorID.sampleSize()];
 	}
-
-	public int getLColorID() {
-		lColorID.fetchSample(lColorIDData, 0);
-		int color = (int) lColorIDData[0];
-		return color;
+	
+	public int getLColorID() { 
+		lColorID.fetchSample(lColorIDData, 0); 
+		int color = (int)lColorIDData[0]; 
+		return color; 
 	}
-
-	public int getRColorID() {
-		rColorID.fetchSample(rColorIDData, 0);
-		int color = (int) rColorIDData[0];
-		return color;
+	public int getRColorID() { 
+		rColorID.fetchSample(rColorIDData, 0); 
+		int color = (int)rColorIDData[0]; 
+		return color; 
 	}
-
+	
 	// Data getters for the front light sensor
 	// The colorID getter
-
-	public int getFColorID() {
-		fColorID.fetchSample(fColorIDData, 0);
-		int color = (int) fColorIDData[0];
-		return color;
-	}
-
+	/**
+	 * Gets the color ID collected from the front sensor
+	 * 
+	 * @return colorID
+	 */
+	/*
+	 * public int getFColorID() { fColorID.fetchSample(fColorIDData, 0); int
+	 * color = (int)fColorIDData[0]; return color; }
+	 */
 	// The color RGB value getter (returns an float array of length 3)
+	/**
+	 * Gets an array of size 3 filled with color sensor samples in RGB mode
+	 * 
+	 * @return tempRGB
+	 */
+	/*
+	 * public float[] getFColorRGB() { float[] tempRGB = new float[3];
+	 * fColorRGB.fetchSample(fColorData, 0); tempRGB[0] = fColorData[0];
+	 * tempRGB[1] = fColorData[1]; tempRGB[2] = fColorData[2]; return tempRGB; }
+	 */
 
-	public float[] getFColorRGB() {
-		float[] tempRGB = new float[3];
-		fColorRGB.fetchSample(fColorData, 0);
-		tempRGB[0] = fColorData[0];
-		tempRGB[1] = fColorData[1];
-		tempRGB[2] = fColorData[2];
-		return tempRGB;
-	}
-
+	// Data getter for the left light sensor
+	// The red color getter
 	/**
 	 * Gets the value collected from the left sensor in red mode
 	 * 

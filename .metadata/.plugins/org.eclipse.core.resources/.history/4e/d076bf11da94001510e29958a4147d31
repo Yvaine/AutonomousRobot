@@ -23,7 +23,7 @@ public class ObstacleAvoider implements TimerListener {
 	int bottomLeftY;
 	int topRightX;
 	int topRightY;
-	public static EV3MediumRegulatedMotor usMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("B"));
+	private static EV3MediumRegulatedMotor usMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("B"));
 
 	public ObstacleAvoider(UltrasonicPoller usPoller, Navigation nav, Odometer odom, int[] coords) {
 		this.usPoller = usPoller;

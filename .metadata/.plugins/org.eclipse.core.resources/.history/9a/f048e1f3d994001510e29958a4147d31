@@ -31,15 +31,7 @@ public class Navigation {
 		this.leftMotor.setAcceleration(ACCELERATION);
 		this.rightMotor.setAcceleration(ACCELERATION);
 	}
-	
-	// rotate both motors by a set degree
-	public void rotateForward(double degree) 
-	{
-		leftMotor.setSpeed(FAST);
-		rightMotor.setSpeed(FAST);
-		leftMotor.rotate((int) degree, true);
-		rightMotor.rotate((int) degree, false);
-	}
+
 	/*
 	 * Functions to set the motor speeds jointly
 	 */
