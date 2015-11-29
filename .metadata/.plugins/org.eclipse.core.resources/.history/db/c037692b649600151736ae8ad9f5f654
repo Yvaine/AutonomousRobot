@@ -135,21 +135,17 @@ public class ObjectDetector{
 		//	since our us sensor cannot give useful value below 5cm or so,
 		//	we need to rely on light sensor
 		//		it is better to test how the color ID changes from far to close for each colored block
-		
-		
-		
-		
-//		while(/*obstacle not identified OR max searching depth not reached*/);
-//		navi.stopMotors();
-//		if(/* the block is the flag */isFlag)
-//		{
-//			//return all the way out to main and run the block catcher
-//			return;
-//		}
-//		else	//the block is not the flag
-//		{
-//			navi.rotateForward(-leftMotor.getTachoCount);//goes back to side
-//		}
+		while(/*obstacle not identified OR max searching depth not reached*/);
+		navi.stopMotors();
+		if(/* the block is the flag */isFlag)
+		{
+			//return all the way out to main and run the block catcher
+			return;
+		}
+		else	//the block is not the flag
+		{
+			navi.rotateForward(-leftMotor.getTachoCount);//goes back to side
+		}
 		
 	}
 	
@@ -175,33 +171,33 @@ public class ObjectDetector{
 	 * @reurn true if the object is a block
 	 * @return false if the object is an obstacle
 	 * */
-//	public boolean isBlock() {
-//		int falsePositiveIterator = 0;
-//
-//		for (int i = 0; i < 20; i++) {
-//			
-//			//if looking for light blue or white blocks
-//			//the light blue blocks show up as white in color ID mode
-//			if ((blockID == 1 || blockID == 4) && lspoller.getFColorID() == 6) {
-//				//if light blue block, use RGB feature
-//				if (blockID == 1){
-//					if (lspoller.getFColorRGB()[0] < 0.2){
-//						continue;
-//					}
-//				}
-//				//otherwise, actual white block
-//				continue;
-//			}
-//			//if red block
-//			if (blockID == 2 && lspoller.getFColorID() == 0) continue;
-//			//if yellow block
-//			if (blockID == 3 && lspoller.getFColorID() == 3) continue;
-//			//if dark blue block
-//			if (blockID == 5 && lspoller.getFColorID() == 2) continue;
-//			
-//			falsePositiveIterator++;
-//		}
-//		
-//	}
+	public boolean isBlock() {
+		int falsePositiveIterator = 0;
+
+		for (int i = 0; i < 20; i++) {
+			
+			//if looking for light blue or white blocks
+			//the light blue blocks show up as white in color ID mode
+			if ((blockID == 1 || blockID == 4) && lspoller.getFColorID() == 6) {
+				//if light blue block, use RGB feature
+				if (blockID == 1){
+					if (lspoller.getFColorRGB()[0] < 0.2){
+						continue;
+					}
+				}
+				//otherwise, actual white block
+				continue;
+			}
+			//if red block
+			if (blockID == 2 && lspoller.getFColorID() == 0) continue;
+			//if yellow block
+			if (blockID == 3 && lspoller.getFColorID() == 3) continue;
+			//if dark blue block
+			if (blockID == 5 && lspoller.getFColorID() == 2) continue;
+			
+			falsePositiveIterator++;
+		}
+		
+	}
 
 }

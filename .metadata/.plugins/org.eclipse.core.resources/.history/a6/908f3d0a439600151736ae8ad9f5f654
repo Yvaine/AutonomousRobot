@@ -217,8 +217,8 @@ public class Navigation {
 
 		double angleToTurn = Odometer.minimumAngleFromTo(this.odometer.getAng(), angle);
 
-		leftMotor.rotate(-convertAngle(2.1, 14.6, angleToTurn), true);
-		rightMotor.rotate(convertAngle(2.1, 14.6, angleToTurn), false);
+		leftMotor.rotate(-convertAngle(2.1, 14.2, angleToTurn), true);
+		rightMotor.rotate(convertAngle(2.1, 14.2, angleToTurn), false);
 
 	}
 
@@ -232,8 +232,8 @@ public class Navigation {
 		leftMotor.setSpeed(FAST);
 		rightMotor.setSpeed(FAST);
 		
-		leftMotor.rotate(-convertAngle(2.1, 14.6, angle), true);
-		rightMotor.rotate(convertAngle(2.1, 14.6, angle), false);
+		leftMotor.rotate(-convertAngle(2.1, 14.2, angle), true);
+		rightMotor.rotate(convertAngle(2.1, 14.2, angle), false);
 	}
 
 	/*
