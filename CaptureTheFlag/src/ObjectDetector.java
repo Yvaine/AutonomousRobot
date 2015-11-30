@@ -11,22 +11,27 @@ public class ObjectDetector{
 	private Odometer odometer;
 	private Navigation navi;
 	private UltrasonicPoller usPoller;
-	private LightSensorPoller lspoller;
-	private boolean isDetectedStyrofoam = false;
-	private int blockID = 0;
+	private LightSensorPoller lsPoller;
 	private int[] enemyBase = new int[4]; //the 4 numbers indicating the bottom left and top right of enemy base region
 	private int[] enemyBaseSide = new int[4];
 	private int currentSide = 2;	//0,1,2,3 indicates east,north,west,south
-	private int searchSpeed = 50;
+	private final int sensorOffset = 16;
+	private final int searchSpeed = 50;
+	private final int searchSpeedLow = 25;
+	private final int searchDepth = 40;
+	private final double tachoDepth;
+	private int currentColor = -1;
+	private int color = -1;	//0=red,1=light blue,2=dark blue,3=yellow,4=white, -1=unknown
 	private boolean isFlag = false;
+	private final int blockID;//need to be preset
 	
 	/**
 	 * Contructs an ObjectDetector object
 	 * */
-	public ObjectDetector(Odometer odometer, Navigation navi, LightSensorPoller lspoller, UltrasonicPoller usPoller, int blockID, int[] enemyBase) {
+	public ObjectDetector(Odometer odometer, Navigation navi, LightSensorPoller lsPoller, UltrasonicPoller usPoller, int blockID, int[] enemyBase) {
 		this.odometer = odometer;
 		this.navi = navi;
-		this.lspoller = lspoller;
+		this.lsPoller = lsPoller;
 		this.usPoller = usPoller;
 		this.blockID = blockID;
 		this.enemyBase = enemyBase;
@@ -35,90 +40,110 @@ public class ObjectDetector{
 		this.enemyBaseSide[2] = this.enemyBase[2] + 15;
 		this.enemyBaseSide[3] = this.enemyBase[3] + 15;
 		this.leftMotor = this.odometer.getLeftMotor();
+		this.tachoDepth = searchDepth*360/(2*Math.PI*odometer.getRadius());
 	}
 
 	public void doObjectSearching()
 	{	
 		navi.travelToLocalization(enemyBaseSide[0], enemyBaseSide[1]);
-		ObstacleAvoider.usMotor.rotate(-90);
+		ObstacleAvoider.usMotor.rotate(-100);
 		//move around the base region, for every 10cm movement, 
 		//search inside the region and see if there is any block in sight
 		//Always search clockwise
 		currentSide = 2;
-		navi.turnTo((currentSide-1)*90, true);
+		navi.turnTo((currentSide-1)*90,true);
 		WestSearch:
 		while(true){
 			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > 20)
+			while(usPoller.getFilteredData() > searchDepth)
 			{
 				if(odometer.getY() > enemyBaseSide[3])
 					break WestSearch;
 			}
-			navi.goForward(10);
+			navi.stopMotors();
+			navi.goForward(sensorOffset);
 			searchInside();
 			if(isFlag)	//if flag found, return out of seaching and do the object catching
 			{
-				ObstacleAvoider.usMotor.rotate(90);
+				ObstacleAvoider.usMotor.rotate(100);
 				return;
 			}
+			navi.turnTo((currentSide-1)*90,true);
+			navi.goForward(5);
 		}
+		navi.stopMotors();
 		
 		currentSide = 1;
-		navi.turnTo((currentSide-1)*90, true);
+		navi.turnTo((currentSide-1)*90,true);
 		NorthSearch:
 		while(true){
+			navi.goForward(sensorOffset/2);
 			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > 20)
+			while(usPoller.getFilteredData() > searchDepth)
 			{
 				if(odometer.getX() > enemyBaseSide[2])
 					break NorthSearch;
 			}
-			navi.goForward(10);
+			navi.stopMotors();
+			navi.goForward(sensorOffset);
 			searchInside();
 			if(isFlag)	//if flag found, return out of seaching and do the object catching
 			{
-				ObstacleAvoider.usMotor.rotate(90);
+				ObstacleAvoider.usMotor.rotate(100);
 				return;
 			}
+			navi.turnTo((currentSide-1)*90,true);
+			navi.goForward(5);
 		}
+		navi.stopMotors();
 		
 		currentSide = 0;
-		navi.turnTo((currentSide-1)*90, true);
+		navi.turnTo((currentSide-1)*90,true);
 		EastSearch:
 		while(true){
+			navi.goForward(sensorOffset/2);
 			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > 20)
+			while(usPoller.getFilteredData() > searchDepth)
 			{
 				if(odometer.getY() < enemyBaseSide[1])
 					break EastSearch;
 			}
-			navi.goForward(10);
+			navi.stopMotors();
+			navi.goForward(sensorOffset);
 			searchInside();
 			if(isFlag)	//if flag found, return out of seaching and do the object catching
 			{
-				ObstacleAvoider.usMotor.rotate(90);
+				ObstacleAvoider.usMotor.rotate(100);
 				return;
 			}
+			navi.turnTo((currentSide-1)*90,true);
+			navi.goForward(5);
 		}
+		navi.stopMotors();
 		
 		currentSide = 3;
-		navi.turnTo((currentSide-1)*90, true);
+		navi.turnTo((currentSide-1)*90,true);
 		SouthSearch:
 		while(true){
+			navi.goForward(sensorOffset/2);
 			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > 20)
+			while(usPoller.getFilteredData() > searchDepth)
 			{
 				if(odometer.getX() < enemyBaseSide[0])
 					break SouthSearch;
 			}
-			navi.goForward(10);
+			navi.stopMotors();
+			navi.goForward(sensorOffset);
 			searchInside();
 			if(isFlag)	//if flag found, return out of seaching and do the object catching
 			{
-				ObstacleAvoider.usMotor.rotate(90);
+				ObstacleAvoider.usMotor.rotate(100);
 				return;
 			}
+			navi.turnTo((currentSide-1)*90,true);
+			navi.goForward(5);
 		}
+		navi.stopMotors();
 		
 		//if code runs to here, 
 		// it means the searching failed.
@@ -127,29 +152,36 @@ public class ObjectDetector{
 	
 	private void searchInside()
 	{
+		double startTacho = 0;
+		Sound.beep();
+		currentColor = -1;	//reset color detection
+		color = -1;
 		navi.turnTo(180 + currentSide*90, true);
-		leftMotor.resetTachoCount();
+		startTacho = leftMotor.getTachoCount();
 
-		navi.setSpeeds(searchSpeed, searchSpeed);
+		navi.setSpeeds(searchSpeedLow, searchSpeedLow);
 		//TODO: here we need some way to identify the block
 		//	since our us sensor cannot give useful value below 5cm or so,
 		//	we need to rely on light sensor
 		//		it is better to test how the color ID changes from far to close for each colored block
-		
-		
-		
-		
-//		while(/*obstacle not identified OR max searching depth not reached*/);
-//		navi.stopMotors();
-//		if(/* the block is the flag */isFlag)
-//		{
-//			//return all the way out to main and run the block catcher
-//			return;
-//		}
-//		else	//the block is not the flag
-//		{
-//			navi.rotateForward(-leftMotor.getTachoCount);//goes back to side
-//		}
+		while( (!blockIdentified()) && ((leftMotor.getTachoCount()-startTacho) < tachoDepth) );
+		navi.stopMotors();
+		if (color == 4){
+			if (Math.abs(lsPoller.getFColorRGB()[0]*100 - lsPoller.getFColorRGB()[2]*100) < 1){
+				color = 1;
+			}
+		}
+		isFlag();
+		if(isFlag)	//the block is identified to be the flag
+		{
+			//return all the way out to main and run the block catcher
+			Sound.beepSequence();
+			return;
+		}
+		else	//the block is not the flag
+		{
+			navi.rotateForward(startTacho-leftMotor.getTachoCount());//goes back to side
+		}
 		
 	}
 	
@@ -163,45 +195,42 @@ public class ObjectDetector{
 		} catch (Exception e) {
 
 		}
-		try {
-			Thread.sleep(3000);
-		} catch (Exception e) {
-
-		}
 	}
 
 	/**
-	 * isBock() will check if the object detected is an obtsacle or the intended block
-	 * @reurn true if the object is a block
+	 * isBlock() will check if the object detected is an obtsacle or the intended block
+	 * @return true if the object is a block
 	 * @return false if the object is an obstacle
 	 * */
-//	public boolean isBlock() {
-//		int falsePositiveIterator = 0;
-//
-//		for (int i = 0; i < 20; i++) {
-//			
-//			//if looking for light blue or white blocks
-//			//the light blue blocks show up as white in color ID mode
-//			if ((blockID == 1 || blockID == 4) && lspoller.getFColorID() == 6) {
-//				//if light blue block, use RGB feature
-//				if (blockID == 1){
-//					if (lspoller.getFColorRGB()[0] < 0.2){
-//						continue;
-//					}
-//				}
-//				//otherwise, actual white block
-//				continue;
-//			}
-//			//if red block
-//			if (blockID == 2 && lspoller.getFColorID() == 0) continue;
-//			//if yellow block
-//			if (blockID == 3 && lspoller.getFColorID() == 3) continue;
-//			//if dark blue block
-//			if (blockID == 5 && lspoller.getFColorID() == 2) continue;
-//			
-//			falsePositiveIterator++;
-//		}
-//		
-//	}
+	private boolean blockIdentified() {
+		if(currentColor == 6)
+		{
+			if(lsPoller.getFColorID() == 7)
+			{
+				color = 4;
+				return true;
+			}
+		}
+		switch(lsPoller.getFColorID())
+		{
+			case 0:
+				color = 0;
+				return true;
+			case 2:
+				color = 2;
+				return true;
+			case 3:
+				color = 3;
+				return true;
+		}
+		if(lsPoller.getFColorID() == 6)
+			currentColor = 6;
+		return false;
+	}
+	
+	private void isFlag()
+	{
+		isFlag = (color == blockID);
+	}
 
 }
