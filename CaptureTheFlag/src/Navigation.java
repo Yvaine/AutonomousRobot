@@ -104,8 +104,8 @@ public class Navigation {
 		// (180.0 / Math.PI);
 		this.turnTo(minAng, true);
 		Sound.beepSequence();
-		this.leftMotor.setSpeed(SLOW);
-		this.rightMotor.setSpeed(SLOW);
+		this.leftMotor.setSpeed(FAST);
+		this.rightMotor.setSpeed(FAST);
 		// double distance = Math.sqrt(Math.pow(odometer.getX() - x,2) +
 		// Math.pow(odometer.getY() - y, 2));
 

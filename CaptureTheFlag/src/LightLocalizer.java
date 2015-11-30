@@ -40,19 +40,19 @@ public class LightLocalizer {
 		
 		navi.setSpeeds(ROTATION_SPEED,ROTATION_SPEED);
 		while(lsPoller.getLColorRed() > AutonomousRobot.samples[0] - 20);
-		odo.setY(-offset+TILE_WIDTH);
+		odo.setY(-offset);
 			
 		navi.goForward(-5);
 		navi.turnTo(0, true);
 		
 		navi.setSpeeds(ROTATION_SPEED,ROTATION_SPEED);
 		while(lsPoller.getLColorRed() > AutonomousRobot.samples[0] - 20);
-		odo.setX(-offset+TILE_WIDTH);
+		odo.setX(-offset);
 		
 		navi.stopMotors();
 		Sound.beep();
 		
-		navi.travelToLocalization(15, 15);
+		navi.travelToLocalization(-15, -15);
 		
 		Sound.beepSequence();
 		

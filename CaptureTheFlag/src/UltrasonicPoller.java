@@ -23,11 +23,8 @@ public class UltrasonicPoller {
 	 */
 	public UltrasonicPoller() {
 		this.usSensor = new EV3UltrasonicSensor(usPort);
-		this.usValue = usSensor.getMode("Distance"); // usValue provides samples
-														// from this instance
-		this.usData = new float[usValue.sampleSize()]; // usData is the buffer
-														// in which data are
-														// returned
+		this.usValue = usSensor.getMode("Distance"); // usValue provides samples from this instance
+		this.usData = new float[usValue.sampleSize()]; // usData is the buffer in which data is returned
 	}
 
 	// filtered ultrasonic data getter

@@ -68,7 +68,8 @@ public class AutonomousRobot {
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
-/*
+
+		/*
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -94,12 +95,14 @@ public class AutonomousRobot {
 			// opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
 			// dropZone_X = t.dropZone_X;
 			// dropZone_Y = t.dropZone_Y;
-			// flagType = t.flagType;
+			flagType = t.flagType;
 			// opponentFlagType = t.opponentFlagType;
 			// ireceived = true;
 			// conn.printTransmission();
 		}
+		LocalEV3.get().getTextLCD().clear();
 		*/
+
 		
 		UltrasonicPoller usPoller = new UltrasonicPoller();
 		LightSensorPoller lsPoller = new LightSensorPoller();
@@ -113,81 +116,30 @@ public class AutonomousRobot {
 		LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
 		lsLocalizer.doLocalization();
 		
-		
 		Thread.sleep(2000);
 		
-		nav.travelToLocalization(15, 15);
+		nav.travelToLocalization(-15, -15);
 		
 		nav.turnTo(0, true);
+		
+		//initialize these for testing purposes
+		homeZoneBL_X = 4;
+		homeZoneBL_Y = 4;
+		homeZoneTR_X = 6;
+		homeZoneTR_Y = 6;
+		flagType = 0;
+				
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{homeZoneBL_X, homeZoneBL_Y, homeZoneTR_X, homeZoneTR_Y});
 		obstacleAvoider.avoidObstacles();
-		// ObstacleAvoider avoider = new ObstacleAvoider(usPoller, nav, odom);
-		// avoider.avoidObstacles();
-		// nav.travelTo(15, 75);
-		// Thread.sleep(2000);
-		// nav.travelTo(75, 75);
-		// nav.travelTo(75, 15);
-		// nav.travelTo(15, 15);
-		// receive transmission
-
-		// OdometryCorrection odomCorr = new OdometryCorrection(odom);
-		// odomCorr.start();
-
-		// USLocalizer usLocal = new USLocalizer(odom, usPoller,
-		// USLocalizer.LocalizationType.FALLING_EDGE, nav);
-		// usLocal.doLocalization();
-		// LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
-		// lsLocalizer.doLocalization();
-
-		/*
-		 * corner ID correction pt 2 //after localization is complete, change
-		 * position and heading to match actual corner value //coordinate should
-		 * be 10*30cm = 300 //ID 2:coordinate (10,0) & heading 90 if
-		 * (corner.getId() == 2){ odom.setPosition(new
-		 * double[]{300-odom.getY(),odom.getX(),odom.getAng()+90}, new
-		 * boolean[]{true, true, true}); } //ID 3: coordinate (10,10) & heading
-		 * 180 else if (corner.getId() == 3){ odom.setPosition(new
-		 * double[]{300-odom.getX(),300-odom.getY(),odom.getAng()+180}, new
-		 * boolean[]{true, true, true}); } //ID 4: cordinate (0,10) & heading
-		 * 270 else if (corner.getId() == 4){ odom.setPosition(new
-		 * double[]{300-odom.getY(),300-odom.getX(),odom.getAng()+270}, new
-		 * boolean[]{true, true, true}); }
-		 */
-
-		// Thread.sleep(2000);
-
-		// leftMotor.rotate(convertAngle(2.1, 15, 90), true);
-		// rightMotor.rotate(-convertAngle(2.1, 15, 90), false);
-		// nav.travelTo(30, 30);
-		// nav.turnTo(0, true);
-
-		// odom.setPosition(new double[]{0, 0, 0}, new boolean[]{true, true,
-		// true});
-
-		// ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav,
-		// odom);
-		// obstacleAvoider.avoidObstacles();
-
-		/*
-		 * System.out.println(
-		 * "Master brick will command the slave brick to catch the block now!");
-		 * 
-		 * RemoteEV3 secondBrick = null; try { secondBrick = new
-		 * RemoteEV3("172.20.10.7"); } catch (RemoteException e) { // TODO
-		 * Auto-generated catch block e.printStackTrace(); }
-		 * 
-		 * if (secondBrick != null) { System.out.println("This part works!!!!");
-		 * RMIRegulatedMotor motor = secondBrick.createRegulatedMotor("B", 'L');
-		 * RMIRegulatedMotor secondMotor = secondBrick.createRegulatedMotor("C",
-		 * 'M');
-		 * 
-		 * BlockCatcher blockCatcher = new BlockCatcher(motor, secondMotor);
-		 * blockCatcher.start(); } else { System.out.println(
-		 * "Second brick is null!"); }
-		 */
-		while (Button.waitForAnyPress() != Button.ID_ESCAPE)
-			;
-		System.exit(0);
+		
+		ObjectDetector obd = new ObjectDetector(odom, nav, lsPoller, usPoller, 
+				flagType, new int[]{homeZoneBL_X*30, homeZoneBL_Y*30, homeZoneTR_X*30, homeZoneTR_Y*30});
+		
+		obd.doObjectSearching();
+		
+		while (Button.waitForAnyPress() != Button.ID_ESCAPE){
+			System.exit(0);
+		}
 	}
 
 	private static int convertAngle(double radius, double width, double angle) {

@@ -18,7 +18,7 @@ public class ObstacleAvoider implements TimerListener {
 	private static int direction;
 	private static int path = 0;	//0 means no available path, 1 means left, 2 means right
 	public static boolean atSide = false;
-	public int USSENSOR_MOTOR_SPEED = 50;
+	public int USSENSOR_MOTOR_SPEED = 60;
 	int bottomLeftX;
 	int bottomLeftY;
 	int topRightX;
@@ -29,10 +29,10 @@ public class ObstacleAvoider implements TimerListener {
 		this.usPoller = usPoller;
 		this.navigator = nav;
 		this.odometer = odom;
-		this.bottomLeftX = coords[0];
-		this.bottomLeftY = coords[1];
-		this.topRightX = coords[2];
-		this.topRightY = coords[3];
+		this.bottomLeftX = coords[0]*30;
+		this.bottomLeftY = coords[1]*30;
+		this.topRightX = coords[2]*30;
+		this.topRightY = coords[3]*30;
 		usMotor.setSpeed(USSENSOR_MOTOR_SPEED);
 	}
 
@@ -189,8 +189,12 @@ public class ObstacleAvoider implements TimerListener {
 	//set to false when destination is reached
 	private boolean destReached()
 	{
-		if(odometer.getX() > 180 && odometer.getX() < 210 && odometer.getY() > 180 && odometer.getY() < 210)
-			return false;
+		/*if(odometer.getX() > 180 && odometer.getX() < 210 && odometer.getY() > 180 && odometer.getY() < 210)
+			return false;*/
+		  if (odometer.getX() > bottomLeftX - 30 && odometer.getX() < topRightX + 30 
+				  && odometer.getY() > bottomLeftY - 30 && odometer.getY() < topRightY + 30){
+			  return false;
+		  }
 		else
 			return true;
 	}

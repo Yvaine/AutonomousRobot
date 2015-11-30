@@ -15,26 +15,13 @@ import lejos.robotics.SampleProvider;
 
 public class LightSensorPoller {
 	/** The left color sensor port */
-	private static final Port lColorPort = LocalEV3.get().getPort("S2"); // The
-																			// port
-																			// for
-																			// left
-																			// light
-																			// sensor
+	private static final Port lColorPort = LocalEV3.get().getPort("S2"); 
 	/** The right color sensor port */
-	private static final Port rColorPort = LocalEV3.get().getPort("S3"); // The
-																			// port
-																			// for
-																			// right
-																			// light
-																			// sensor
+	private static final Port rColorPort = LocalEV3.get().getPort("S3"); 
 	/** The front color sensor port */
 	private static final Port fColorPort = LocalEV3.get().getPort("S4");
-	// //The port for front light sensor
 	/** The left color sensor mode */
-	private static SensorModes lColorSensor = new EV3ColorSensor(lColorPort); // The
-																				// corresponding
-																				// SensorModes
+	private static SensorModes lColorSensor = new EV3ColorSensor(lColorPort);
 	/** The right color sensor mode */
 	private static SensorModes rColorSensor = new EV3ColorSensor(rColorPort);
 	/** The front color sensor mode */
@@ -70,22 +57,19 @@ public class LightSensorPoller {
 	 * fills the buffers with their appropriate samples
 	 */
 	public LightSensorPoller() {
-		this.lColorRed = lColorSensor.getMode("Red"); // LcolorR provides Red
-														// samples from this
-														// instance
-		this.rColorRed = rColorSensor.getMode("Red"); // RcolorR provides Red
-														// samples from this
-														// instance
-		// this.fColorID = fColorSensor.getMode("ColorID"); // FcolorID provides
-		// one of the 8 color ID's corresponding integers
-		// this.fColorRGB = fColorSensor.getMode("RGB"); // FcolorRGB provides
-		// RGB samples from this instance
+		// LcolorR provides Red samples from this instance
+		this.lColorRed = lColorSensor.getMode("Red"); 
+		// RcolorR provides Red samples from this instance
+		this.rColorRed = rColorSensor.getMode("Red"); 
+		// FcolorID provides one of the 14 color ID's corresponding integers
+		this.fColorID = fColorSensor.getMode("ColorID"); 
+		// FcolorRGB provides RGB samples from this instance
+		this.fColorRGB = fColorSensor.getMode("RGB"); 
 
 		this.lColorData = new float[lColorRed.sampleSize()]; // The data buffers
 		this.rColorData = new float[rColorRed.sampleSize()];
-		// this.fColorIDData = new float[fColorID.sampleSize()];
-		// this.fColorData = new float[fColorRGB.sampleSize()];
-
+		this.fColorIDData = new float[fColorID.sampleSize()];
+		this.fColorData = new float[fColorRGB.sampleSize()];
 		this.lColorID = lColorSensor.getMode("ColorID");
 		this.rColorID = rColorSensor.getMode("ColorID");
 		this.lColorIDData = new float[lColorID.sampleSize()];
