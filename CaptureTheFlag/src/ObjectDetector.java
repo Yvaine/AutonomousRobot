@@ -21,7 +21,7 @@ public class ObjectDetector{
 	private final int searchDepth = 40;
 	private final double tachoDepth;
 	private int currentColor = -1;
-	private int color = -1;	//0=red,1=light blue,2=dark blue,3=yellow,4=white, -1=unknown
+	private int color = -1;	//1=light blue, 2=red, 3=yellow, 4=white, 5=dark blue, -1=unknown
 	private boolean isFlag = false;
 	private final int blockID;//need to be preset
 	
@@ -166,10 +166,8 @@ public class ObjectDetector{
 		//		it is better to test how the color ID changes from far to close for each colored block
 		while( (!blockIdentified()) && ((leftMotor.getTachoCount()-startTacho) < tachoDepth) );
 		navi.stopMotors();
-		if (color == 4){
-			if (Math.abs(lsPoller.getFColorRGB()[0]*100 - lsPoller.getFColorRGB()[2]*100) < 1){
-				color = 1;
-			}
+		if (color == 4 && Math.abs(lsPoller.getFColorRGB()[0]*100 - lsPoller.getFColorRGB()[2]*100) < 1){
+			color = 1;
 		}
 		isFlag();
 		if(isFlag)	//the block is identified to be the flag
@@ -213,12 +211,15 @@ public class ObjectDetector{
 		}
 		switch(lsPoller.getFColorID())
 		{
+			//red
 			case 0:
-				color = 0;
-				return true;
-			case 2:
 				color = 2;
 				return true;
+			//d.blue
+			case 2:
+				color = 5;
+				return true;
+			//yellow
 			case 3:
 				color = 3;
 				return true;

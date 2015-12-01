@@ -50,7 +50,7 @@ public class AutonomousRobot {
 
 	private static TextLCD LCD = LocalEV3.get().getTextLCD();
 
-	static StartCorner corner;
+	static StartCorner corner = StartCorner.BOTTOM_LEFT;
 	static int homeZoneBL_X;
 	static int homeZoneBL_Y;
 	static int homeZoneTR_X;
@@ -63,8 +63,6 @@ public class AutonomousRobot {
 	static int dropZone_Y;
 	static int flagType;
 	static int opponentFlagType;
-
-	static boolean ireceived = false;
 
 	@SuppressWarnings("resource")
 	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
@@ -83,26 +81,33 @@ public class AutonomousRobot {
 		if (t == null) {
 			LCD.drawString("Failed to read transmission", 0, 5);
 		} else {
-			// corner = t.startingCorner;
+			corner = t.startingCorner;
 			homeZoneBL_X = t.homeZoneBL_X;
 			homeZoneBL_Y = t.homeZoneBL_Y;
 			homeZoneTR_X = t.homeZoneTR_X;
 			homeZoneTR_Y = t.homeZoneTR_Y;
-			
-			// opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
-			// opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
-			// opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
-			// opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
-			// dropZone_X = t.dropZone_X;
-			// dropZone_Y = t.dropZone_Y;
+			opponentHomeZoneBL_X = t.opponentHomeZoneBL_X;
+			opponentHomeZoneBL_Y = t.opponentHomeZoneBL_Y;
+			opponentHomeZoneTR_X = t.opponentHomeZoneTR_X;
+			opponentHomeZoneTR_Y = t.opponentHomeZoneTR_Y;
+			dropZone_X = t.dropZone_X;
+			dropZone_Y = t.dropZone_Y;
 			flagType = t.flagType;
-			// opponentFlagType = t.opponentFlagType;
-			// ireceived = true;
+			opponentFlagType = t.opponentFlagType;
 			// conn.printTransmission();
-		}
-		LocalEV3.get().getTextLCD().clear();
-		*/
-
+			LocalEV3.get().getTextLCD().clear();
+		}*/
+		
+		//initialize these for testing purposes
+		corner = StartCorner.TOP_RIGHT;
+		opponentHomeZoneBL_X = 0;
+		opponentHomeZoneBL_Y = 0;
+		opponentHomeZoneTR_X = 2;
+		opponentHomeZoneTR_Y = 2;
+		flagType = 2;
+		dropZone_X = 0;
+		dropZone_Y = 3;
+		
 		
 		UltrasonicPoller usPoller = new UltrasonicPoller();
 		LightSensorPoller lsPoller = new LightSensorPoller();
@@ -118,24 +123,40 @@ public class AutonomousRobot {
 		
 		Thread.sleep(2000);
 		
-		nav.travelToLocalization(-15, -15);
-		
 		nav.turnTo(0, true);
 		
-		//initialize these for testing purposes
-		homeZoneBL_X = 4;
-		homeZoneBL_Y = 4;
-		homeZoneTR_X = 6;
-		homeZoneTR_Y = 6;
-		flagType = 0;
-				
-		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{homeZoneBL_X, homeZoneBL_Y, homeZoneTR_X, homeZoneTR_Y});
+		//correct the coordinates for the corner ID given
+		//bottom right
+		if (corner.getId() == 2){
+			odom.setPosition(new double[]{300-odom.getY(),odom.getX(),odom.getAng()+90}, 
+					new boolean[]{true, true, true}); 
+		}
+		//top right
+		else if (corner.getId() == 3){
+			odom.setPosition(new double[]{300-odom.getX(),300-odom.getY(),odom.getAng()+180}, 
+					new boolean[]{true, true, true});
+		}
+		//top left
+		else if (corner.getId() == 4){
+			odom.setPosition(new double[]{odom.getY(),300-odom.getX(),odom.getAng()+270}, 
+					new boolean[]{true, true, true});
+		}
+		
+		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, 
+				new int[]{opponentHomeZoneBL_X, opponentHomeZoneBL_Y, opponentHomeZoneTR_X, opponentHomeZoneTR_Y});
 		obstacleAvoider.avoidObstacles();
 		
 		ObjectDetector obd = new ObjectDetector(odom, nav, lsPoller, usPoller, 
 				flagType, new int[]{homeZoneBL_X*30, homeZoneBL_Y*30, homeZoneTR_X*30, homeZoneTR_Y*30});
 		
 		obd.doObjectSearching();
+		
+		//BlockCatcher.catch();
+		
+		//go to dropoff zone
+		obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{dropZone_X, dropZone_Y, dropZone_X+1, dropZone_Y+1});
+		
+		//BlockCatcher.drop();
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE){
 			System.exit(0);
