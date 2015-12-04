@@ -15,9 +15,10 @@ public class ObjectDetector{
 	private int[] enemyBase = new int[4]; //the 4 numbers indicating the bottom left and top right of enemy base region
 	private int[] enemyBaseSide = new int[4];
 	private int currentSide = 2;	//0,1,2,3 indicates east,north,west,south
-	private final int sensorOffset = 16;
-	private final int searchSpeed = 50;
-	private final int searchSpeedLow = 25;
+	private final int sensorOffset = 15;
+	private final int blockOffset = 8;
+	private final int searchSpeed = 200;
+	private final int searchSpeedLow = 60;
 	private final int searchDepth = 40;
 	private final double tachoDepth;
 	private int currentColor = -1;
@@ -45,109 +46,112 @@ public class ObjectDetector{
 
 	public void doObjectSearching()
 	{	
-		navi.travelToLocalization(enemyBaseSide[0], enemyBaseSide[1]);
-		ObstacleAvoider.usMotor.rotate(-100);
-		//move around the base region, for every 10cm movement, 
-		//search inside the region and see if there is any block in sight
-		//Always search clockwise
-		currentSide = 2;
-		navi.turnTo((currentSide-1)*90,true);
-		WestSearch:
-		while(true){
-			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > searchDepth)
-			{
-				if(odometer.getY() > enemyBaseSide[3])
-					break WestSearch;
+		while(true)
+		{
+			navi.travelToLocalization(enemyBaseSide[0], enemyBaseSide[1]);
+			ObstacleAvoider.usMotor.rotate(-100);
+			//move around the base region, for every 10cm movement, 
+			//search inside the region and see if there is any block in sight
+			//Always search clockwise
+			currentSide = 2;
+			navi.turnTo((currentSide-1)*90,true);
+			WestSearch:
+			while(true){
+				navi.setSpeeds(searchSpeed, searchSpeed);
+				while(usPoller.getFilteredData() > searchDepth)
+				{
+					if(odometer.getY() > enemyBaseSide[3])
+						break WestSearch;
+				}
+				navi.stopMotors();
+				navi.goForward(sensorOffset);
+				searchInside();
+				if(isFlag)	//if flag found, return out of seaching and do the object catching
+				{
+					ObstacleAvoider.usMotor.rotate(100);
+					return;
+				}
+				navi.turnTo((currentSide-1)*90,true);
+				navi.goForward(blockOffset);
 			}
 			navi.stopMotors();
-			navi.goForward(sensorOffset);
-			searchInside();
-			if(isFlag)	//if flag found, return out of seaching and do the object catching
-			{
-				ObstacleAvoider.usMotor.rotate(100);
-				return;
-			}
+			
+			currentSide = 1;
 			navi.turnTo((currentSide-1)*90,true);
-			navi.goForward(5);
-		}
-		navi.stopMotors();
-		
-		currentSide = 1;
-		navi.turnTo((currentSide-1)*90,true);
-		NorthSearch:
-		while(true){
-			navi.goForward(sensorOffset/2);
-			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > searchDepth)
-			{
-				if(odometer.getX() > enemyBaseSide[2])
-					break NorthSearch;
+			NorthSearch:
+			while(true){
+				navi.goForward(sensorOffset/2);
+				navi.setSpeeds(searchSpeed, searchSpeed);
+				while(usPoller.getFilteredData() > searchDepth)
+				{
+					if(odometer.getX() > enemyBaseSide[2])
+						break NorthSearch;
+				}
+				navi.stopMotors();
+				navi.goForward(sensorOffset);
+				searchInside();
+				if(isFlag)	//if flag found, return out of seaching and do the object catching
+				{
+					ObstacleAvoider.usMotor.rotate(100);
+					return;
+				}
+				navi.turnTo((currentSide-1)*90,true);
+				navi.goForward(blockOffset);
 			}
 			navi.stopMotors();
-			navi.goForward(sensorOffset);
-			searchInside();
-			if(isFlag)	//if flag found, return out of seaching and do the object catching
-			{
-				ObstacleAvoider.usMotor.rotate(100);
-				return;
-			}
+			
+			currentSide = 0;
 			navi.turnTo((currentSide-1)*90,true);
-			navi.goForward(5);
-		}
-		navi.stopMotors();
-		
-		currentSide = 0;
-		navi.turnTo((currentSide-1)*90,true);
-		EastSearch:
-		while(true){
-			navi.goForward(sensorOffset/2);
-			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > searchDepth)
-			{
-				if(odometer.getY() < enemyBaseSide[1])
-					break EastSearch;
+			EastSearch:
+			while(true){
+				navi.goForward(sensorOffset/2);
+				navi.setSpeeds(searchSpeed, searchSpeed);
+				while(usPoller.getFilteredData() > searchDepth)
+				{
+					if(odometer.getY() < enemyBaseSide[1])
+						break EastSearch;
+				}
+				navi.stopMotors();
+				navi.goForward(sensorOffset);
+				searchInside();
+				if(isFlag)	//if flag found, return out of seaching and do the object catching
+				{
+					ObstacleAvoider.usMotor.rotate(100);
+					return;
+				}
+				navi.turnTo((currentSide-1)*90,true);
+				navi.goForward(blockOffset);
 			}
 			navi.stopMotors();
-			navi.goForward(sensorOffset);
-			searchInside();
-			if(isFlag)	//if flag found, return out of seaching and do the object catching
-			{
-				ObstacleAvoider.usMotor.rotate(100);
-				return;
-			}
+			
+			currentSide = 3;
 			navi.turnTo((currentSide-1)*90,true);
-			navi.goForward(5);
-		}
-		navi.stopMotors();
-		
-		currentSide = 3;
-		navi.turnTo((currentSide-1)*90,true);
-		SouthSearch:
-		while(true){
-			navi.goForward(sensorOffset/2);
-			navi.setSpeeds(searchSpeed, searchSpeed);
-			while(usPoller.getFilteredData() > searchDepth)
-			{
-				if(odometer.getX() < enemyBaseSide[0])
-					break SouthSearch;
+			SouthSearch:
+			while(true){
+				navi.goForward(sensorOffset/2);
+				navi.setSpeeds(searchSpeed, searchSpeed);
+				while(usPoller.getFilteredData() > searchDepth)
+				{
+					if(odometer.getX() < enemyBaseSide[0])
+						break SouthSearch;
+				}
+				navi.stopMotors();
+				navi.goForward(sensorOffset);
+				searchInside();
+				if(isFlag)	//if flag found, return out of seaching and do the object catching
+				{
+					ObstacleAvoider.usMotor.rotate(100);
+					return;
+				}
+				navi.turnTo((currentSide-1)*90,true);
+				navi.goForward(blockOffset);
 			}
 			navi.stopMotors();
-			navi.goForward(sensorOffset);
-			searchInside();
-			if(isFlag)	//if flag found, return out of seaching and do the object catching
-			{
-				ObstacleAvoider.usMotor.rotate(100);
-				return;
-			}
-			navi.turnTo((currentSide-1)*90,true);
-			navi.goForward(5);
+			
+			//if code runs to here, 
+			// it means the searching failed.
+			// We might code the robot to search again
 		}
-		navi.stopMotors();
-		
-		//if code runs to here, 
-		// it means the searching failed.
-		// We might code the robot to search again
 	}
 	
 	private void searchInside()
@@ -181,18 +185,6 @@ public class ObjectDetector{
 			navi.rotateForward(startTacho-leftMotor.getTachoCount());//goes back to side
 		}
 		
-	}
-	
-	private void catchBlock() {
-		// AutonomousRobot.blockCatcherMotor.setSpeed(20);
-		// AutonomousRobot.blockCatcherMotor.rotate(250);
-		AutonomousRobot.rightMotor.setSpeed(100);
-		AutonomousRobot.leftMotor.setSpeed(100);
-		try {
-			Thread.sleep(3000);
-		} catch (Exception e) {
-
-		}
 	}
 
 	/**

@@ -7,11 +7,11 @@ public class BlockCatcher extends Thread{
 	private RMIRegulatedMotor catcherArm;
 	private RMIRegulatedMotor catcherHand;
 	private boolean toRelease;		//true if a signal is received to ask the catcher to release the block
-	private boolean done;			//true if the current task of catcher is done
-	private final int catchSpeed = 20;	//the rotation speed of catcher motors
-	private final int handOpenAngle = -100;
-	private final int handCloseAngle = 150;
-	private final int armUpAngle = 180;
+	private static boolean done;			//true if the current task of catcher is done
+	private final int catchSpeed = 40;	//the rotation speed of catcher motors
+	private final int handOpenAngle = -60;
+	private final int handCloseAngle = 100;
+	private final int armUpAngle = 230;
 	private final int armDownAngle = -180;
 	
 	public BlockCatcher(RMIRegulatedMotor catcherArm, RMIRegulatedMotor catcherHand)
@@ -19,7 +19,7 @@ public class BlockCatcher extends Thread{
 		this.catcherArm = catcherArm;
 		this.catcherHand = catcherHand;
 		this.toRelease = false;
-		this.done = false;
+		done = false;
 	}
 	
 	//it is a one time process
@@ -39,22 +39,17 @@ public class BlockCatcher extends Thread{
 			e1.printStackTrace();
 		}
 		try {
-			this.catcherArm.rotate(armDownAngle,true);
-		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
 			this.catcherHand.rotate(handOpenAngle,false);
 		} catch (RemoteException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		try
-		{
-			Thread.sleep(800);
+		try {
+			this.catcherArm.rotate(armDownAngle,false);
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		catch(Exception e){}
 		
 		try {
 			this.catcherHand.rotate(handCloseAngle,false);
@@ -68,12 +63,12 @@ public class BlockCatcher extends Thread{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.done = true;
+		done = true;
 		Sound.beep();
 		
 		while(!toRelease);
 		
-		this.done = false;
+		done = false;
 		try {
 			this.catcherArm.rotate(armDownAngle,false);
 		} catch (RemoteException e) {
@@ -81,12 +76,12 @@ public class BlockCatcher extends Thread{
 			e.printStackTrace();
 		}
 		try {
-			this.catcherHand.rotate(handOpenAngle,false);
+			this.catcherHand.rotate(-handCloseAngle,false);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.done = true;
+		done = true;
 	}
 	
 	//ask the catcher to release the block
@@ -102,8 +97,8 @@ public class BlockCatcher extends Thread{
 	 * I am not sure about how the delay will occur, and this method may be replaced by
 	 * a simple sleep.
 	 */
-	public boolean currentMoveDone()
+	public static boolean currentMoveDone()
 	{
-		return this.done;
+		return done;
 	}
 }

@@ -10,7 +10,7 @@ import lejos.robotics.SampleProvider;
  */
 public class UltrasonicPoller {
 	private static int distanceThreshold = 250;
-	private static final Port usPort = LocalEV3.get().getPort("S1");
+	private static final Port usPort = LocalEV3.get().getPort("S2");
 	private SensorModes usSensor;
 	private SampleProvider usValue;
 	private float[] usData;

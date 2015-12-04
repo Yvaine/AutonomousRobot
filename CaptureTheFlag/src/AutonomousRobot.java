@@ -40,12 +40,15 @@ public class AutonomousRobot {
 	public static EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	public static EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	public static float[] samples = new float[10];
+
 	
 	public static int displayX = 0;
 	public static int displayY = 0;
 
 	// for retrieving transmission info
-	private static final String SERVER_IP = "172.20.10.4";
+	// professor's IP address: 192.168.10.200
+	private static final String SERVER_IP = "192.168.10.200";
+	//private static final String SERVER_IP = "192.168.10.51";
 	private static final int TEAM_NUMBER = 2;
 
 	private static TextLCD LCD = LocalEV3.get().getTextLCD();
@@ -65,9 +68,9 @@ public class AutonomousRobot {
 	static int opponentFlagType;
 
 	@SuppressWarnings("resource")
-	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException {
+	public static void main(String[] args) throws MalformedURLException, NotBoundException, InterruptedException, RemoteException {
 
-		/*
+		
 		WifiConnection conn = null;
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
@@ -96,18 +99,17 @@ public class AutonomousRobot {
 			opponentFlagType = t.opponentFlagType;
 			// conn.printTransmission();
 			LocalEV3.get().getTextLCD().clear();
-		}*/
+		}
 		
-		//initialize these for testing purposes
-		corner = StartCorner.TOP_RIGHT;
-		opponentHomeZoneBL_X = 0;
-		opponentHomeZoneBL_Y = 0;
-		opponentHomeZoneTR_X = 2;
-		opponentHomeZoneTR_Y = 2;
-		flagType = 2;
-		dropZone_X = 0;
-		dropZone_Y = 3;
-		
+		// initialize these for testing purposes
+		// corner = StartCorner.TOP_RIGHT;
+		// opponentHomeZoneBL_X = 8;
+		// opponentHomeZoneBL_Y = 8;
+		// opponentHomeZoneTR_X = 10;
+		// opponentHomeZoneTR_Y = 10;
+		// flagType = 4;
+		// dropZone_X = 3;
+		// dropZone_Y = 7; 
 		
 		UltrasonicPoller usPoller = new UltrasonicPoller();
 		LightSensorPoller lsPoller = new LightSensorPoller();
@@ -116,6 +118,7 @@ public class AutonomousRobot {
 		OdometryCorrection corr = new OdometryCorrection(odom, lsPoller);
 		Navigation nav = new Navigation(odom, corr);
 
+		
 		USLocalizer usLocal = new USLocalizer(odom, usPoller, USLocalizer.LocalizationType.FALLING_EDGE, nav);
 		usLocal.doLocalization();
 		LightLocalizer lsLocalizer = new LightLocalizer(odom, lsPoller, nav);
@@ -123,40 +126,69 @@ public class AutonomousRobot {
 		
 		Thread.sleep(2000);
 		
-		nav.turnTo(0, true);
-		
 		//correct the coordinates for the corner ID given
 		//bottom right
+		int temp;
 		if (corner.getId() == 2){
-			odom.setPosition(new double[]{300-odom.getY(),odom.getX(),odom.getAng()+90}, 
-					new boolean[]{true, true, true}); 
+			temp = opponentHomeZoneBL_X;
+			opponentHomeZoneBL_X = opponentHomeZoneBL_Y;
+			opponentHomeZoneBL_Y = 10 - opponentHomeZoneTR_X;
+			opponentHomeZoneTR_X = opponentHomeZoneTR_Y;
+			opponentHomeZoneTR_Y = 10 - temp;
+			temp = dropZone_X;
+			dropZone_X = dropZone_Y;
+			dropZone_Y = 10 - temp -1;
 		}
 		//top right
 		else if (corner.getId() == 3){
-			odom.setPosition(new double[]{300-odom.getX(),300-odom.getY(),odom.getAng()+180}, 
-					new boolean[]{true, true, true});
+			temp = opponentHomeZoneBL_X;
+			opponentHomeZoneBL_X = 10 - opponentHomeZoneTR_X;
+			opponentHomeZoneTR_X = 10 - temp;
+			temp = opponentHomeZoneBL_Y;
+			opponentHomeZoneBL_Y = 10 - opponentHomeZoneTR_Y;
+			opponentHomeZoneTR_Y = 10 - temp;
+			dropZone_X = 10 - 1 - dropZone_X;
+			dropZone_Y = 10 - 1 - dropZone_Y;
 		}
 		//top left
 		else if (corner.getId() == 4){
-			odom.setPosition(new double[]{odom.getY(),300-odom.getX(),odom.getAng()+270}, 
-					new boolean[]{true, true, true});
+			temp = opponentHomeZoneBL_X;
+			opponentHomeZoneBL_X = 10 - opponentHomeZoneTR_Y;
+			opponentHomeZoneTR_Y = opponentHomeZoneTR_X;
+			opponentHomeZoneTR_X = 10 - opponentHomeZoneBL_Y;
+			opponentHomeZoneBL_Y = temp;
+			temp = dropZone_X;
+			dropZone_X = 10 - 1 - dropZone_Y;
+			dropZone_Y = temp;
 		}
 		
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, 
 				new int[]{opponentHomeZoneBL_X, opponentHomeZoneBL_Y, opponentHomeZoneTR_X, opponentHomeZoneTR_Y});
-		obstacleAvoider.avoidObstacles();
+		obstacleAvoider.avoidObstaclesTowards();
 		
 		ObjectDetector obd = new ObjectDetector(odom, nav, lsPoller, usPoller, 
-				flagType, new int[]{homeZoneBL_X*30, homeZoneBL_Y*30, homeZoneTR_X*30, homeZoneTR_Y*30});
+				opponentFlagType, new int[]{opponentHomeZoneBL_X*30, opponentHomeZoneBL_Y*30, opponentHomeZoneTR_X*30, opponentHomeZoneTR_Y*30});
 		
 		obd.doObjectSearching();
 		
-		//BlockCatcher.catch();
+		RemoteEV3 secondBrick = new RemoteEV3("192.168.10.50");
+		RMIRegulatedMotor catcherHand = secondBrick.createRegulatedMotor("C", 'M');
+		RMIRegulatedMotor catcherArm = secondBrick.createRegulatedMotor("B", 'L');
+		BlockCatcher catcher = new BlockCatcher(catcherArm, catcherHand);
+		nav.goForward(-5);
+		nav.turn(180);
+		catcher.start();
+		while(!BlockCatcher.currentMoveDone());
 		
 		//go to dropoff zone
-		obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{dropZone_X, dropZone_Y, dropZone_X+1, dropZone_Y+1});
 		
+		obstacleAvoider = new ObstacleAvoider(usPoller, nav, odom, new int[]{dropZone_X, dropZone_Y, dropZone_X+1, dropZone_Y+1});
+		nav.travelToLocalization(opponentHomeZoneBL_X*30 - 15, opponentHomeZoneBL_Y*30 - 15);
+		obstacleAvoider.avoidObstaclesReturn();
 		//BlockCatcher.drop();
+		nav.turnTo(nav.angleToPoint(dropZone_X*30+15, dropZone_Y*30+15) + 180, true);
+		nav.goForward(-10);
+		catcher.Release();
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE){
 			System.exit(0);

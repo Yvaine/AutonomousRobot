@@ -1,0 +1,194 @@
+/*
+ * OdometryCorrection.java
+ * edditor : Jiaao Guan
+ */
+
+import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.hardware.port.Port;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.SensorMode;
+
+import java.lang.Math;
+
+
+/**
+ * 
+ * @author Ralph Bou Samra
+ * @version v1.0
+ * */
+
+public class OdometryCorrection extends Thread {
+
+	private Odometer odometer;
+	private LightSensorPoller lsPoller;
+	
+	public static boolean odometryWorking = false;
+	private boolean correctionON;
+	private static final long CORRECTION_PERIOD = 100;
+	private final static int LightThreshold = 55;
+	private final static int TILE_WIDTH = 30;
+	private final static int HALF_TILE = TILE_WIDTH/2;
+	private final static double sensorDistanceToCenter = -3.5; // Distance of the
+															// sensor to the
+															// center
+	
+	// constructor
+	/**
+	 * Constructs an Odometry Correction object initilaizing the light sensors  
+	 * */
+	public OdometryCorrection(Odometer odometer, LightSensorPoller lsPoller) {
+		this.odometer = odometer;
+		this.lsPoller = lsPoller;
+		this.correctionON = true;
+	}
+
+	/**
+	 * Collect samples from the right and left light sensors
+	 * @return array of size 2 containing left and right sensor samples
+	 * */
+	
+	
+	/**
+	 * Gets theta X
+	 * @return thetaX
+	 * */
+	double getThetaX() {
+		return Math.sin(odometer.getAng() * sensorDistanceToCenter);
+	}
+
+	/**
+	 * Gets theta Y
+	 * @ return thetaY
+	 * */
+	double getThetaY() {
+		return Math.cos(odometer.getAng() * sensorDistanceToCenter);
+	}
+	
+	//the class running controllers
+	
+	//stop correction
+	public void stopCorrection()
+	{
+		this.correctionON = false;
+	}
+	
+	/**
+	 * run() automatically executes when start is called on an OdomteryCorrection object
+	 * */
+	public void doCorrection() {
+		long correctionStart, correctionEnd;
+		//correctionON = true;
+		
+			correctionStart = System.currentTimeMillis();
+			
+			// the robot is in a diagonal position with a positive slope
+			
+			double currentTurningAngle = 0.0;
+			
+			
+			if(lsPoller.getLColorRed() < AutonomousRobot.samples[0] - 16){
+				odometryWorking = true;
+				odometer.getLeftMotor().stop(true);
+
+				
+				while(lsPoller.getRColorRed() > AutonomousRobot.samples[1] - 16);
+				odometer.getRightMotor().stop(true);
+				
+				calculateCorrection();	
+				odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
+				odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
+				ObstacleAvoider.seekPath();
+				//correctionON = false;
+				
+			}
+			// the robot is in a diagonal position with a negative slope
+			else if(lsPoller.getRColorRed() < AutonomousRobot.samples[1] - 16){
+				//Sound.beepSequence();
+				odometryWorking = true;
+				odometer.getRightMotor().stop(true);
+				
+				while(lsPoller.getLColorRed() > AutonomousRobot.samples[0] - 16);
+				odometer.getLeftMotor().stop(true);
+				
+				calculateCorrection();
+				
+				odometer.getLeftMotor().rotate(convertDistance(2.1, 2.0), true);
+				odometer.getRightMotor().rotate(convertDistance(2.1, 2.0), false);
+				ObstacleAvoider.seekPath();
+				
+				//odometer.getLeftMotor().forward();
+				//odometer.getRightMotor().forward();
+				//correctionON = false;
+			}
+
+			
+			
+				correctionEnd = System.currentTimeMillis();
+				if (correctionEnd - correctionStart < CORRECTION_PERIOD) {
+					try {
+						Thread.sleep(CORRECTION_PERIOD - (correctionEnd - correctionStart));
+					} catch (InterruptedException e) {
+						// there is nothing to be done here because it is not
+						// expected that the odometry correction will be
+						// interrupted by another thread
+					}
+				}
+			}
+		
+	
+	
+	private static int convertDistance(double radius, double distance) {
+		return (int)((distance*180.0)/(Math.PI*radius));
+	}
+	
+	//calculate the correction and correct the odometer
+	private void calculateCorrection()
+	{
+		double error;
+		int direction = (((int)odometer.getAng()+45)%360)/90;	//0,1,2,3 means E,N,W,S respectively
+		switch(direction)
+		{
+			case 0:	error = (odometer.getX() + sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+					break;
+			case 1:	error = (odometer.getY() + sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+					break;
+			case 2:	error = (odometer.getX()  - sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+					break;
+			default:	error = (odometer.getY()  - sensorDistanceToCenter + HALF_TILE) % TILE_WIDTH - HALF_TILE;
+					break;
+		}
+		
+		boolean[] XYTheta = new boolean[3];
+		switch(direction)
+		{
+			case 0:	XYTheta = new boolean[]{true, false, true};
+					break;
+			case 1:	XYTheta = new boolean[]{false, true, true};
+					break;
+			case 2:	XYTheta = new boolean[]{true, false, true};
+					break;
+			case 3:	XYTheta = new boolean[]{false, true, true};
+					break;
+		}
+		
+		odometer.setPosition(new double[]{odometer.getX() - error,  odometer.getY() - error, 90*direction}, XYTheta);
+	}
+
+	// When the robot has a theta in the range of -45 deg to 45 deg +ve Y
+	// When the robot has a theta in the range of 135 deg to 225 de, -ve Y
+	
+	/**
+	 * isMovingVertically returns whether the robot is going in the y direction instead of the x direction
+	 * @param current theta
+	 * @return true if the robot is in the y direction, false if the robot is in the x direction 
+	 * */
+	public boolean isMovingVertically(double theta) {
+		if (Math.abs(theta) < 45 * Math.PI / 180 || (theta > 135 * Math.PI / 180 && theta < 225 * Math.PI / 180)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}

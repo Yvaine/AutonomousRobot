@@ -15,11 +15,11 @@ import lejos.robotics.SampleProvider;
 
 public class LightSensorPoller {
 	/** The left color sensor port */
-	private static final Port lColorPort = LocalEV3.get().getPort("S2"); 
+	private static final Port lColorPort = LocalEV3.get().getPort("S1"); 
 	/** The right color sensor port */
-	private static final Port rColorPort = LocalEV3.get().getPort("S3"); 
+	private static final Port rColorPort = LocalEV3.get().getPort("S4"); 
 	/** The front color sensor port */
-	private static final Port fColorPort = LocalEV3.get().getPort("S4");
+	private static final Port fColorPort = LocalEV3.get().getPort("S3");
 	/** The left color sensor mode */
 	private static SensorModes lColorSensor = new EV3ColorSensor(lColorPort);
 	/** The right color sensor mode */

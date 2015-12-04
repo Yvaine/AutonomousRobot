@@ -13,7 +13,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation {
 	private OdometryCorrection odomCorrection;
-	final static int FAST = 200, SLOW = 100, ACCELERATION = 6000;
+	final static int FAST = 300, SLOW = 200, ACCELERATION = 6000;
 	final static double DEG_ERR = 1.0, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
@@ -93,10 +93,7 @@ public class Navigation {
 
 		double minAng = 0.0;
 
-		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
-		if (minAng < 0) {
-			minAng += 360.0;
-		}
+		minAng = angleToPoint(x, y);
 
 		display.print("MinAng: ", "" + minAng, 7);
 
@@ -104,8 +101,8 @@ public class Navigation {
 		// (180.0 / Math.PI);
 		this.turnTo(minAng, true);
 		Sound.beepSequence();
-		this.leftMotor.setSpeed(FAST);
-		this.rightMotor.setSpeed(FAST);
+		this.leftMotor.setSpeed(SLOW);
+		this.rightMotor.setSpeed(SLOW);
 		// double distance = Math.sqrt(Math.pow(odometer.getX() - x,2) +
 		// Math.pow(odometer.getY() - y, 2));
 
@@ -139,10 +136,7 @@ public class Navigation {
 	public void travelToLocalization(double x, double y) {
 		double minAng = 0.0;
 
-		minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
-		if (minAng < 0) {
-			minAng += 360.0;
-		}
+		minAng = angleToPoint(x, y);
 
 		display.print("MinAng: ", "" + minAng, 7);
 
@@ -217,8 +211,8 @@ public class Navigation {
 
 		double angleToTurn = Odometer.minimumAngleFromTo(this.odometer.getAng(), angle);
 
-		leftMotor.rotate(-convertAngle(2.1, 14.6, angleToTurn), true);
-		rightMotor.rotate(convertAngle(2.1, 14.6, angleToTurn), false);
+		leftMotor.rotate(-convertAngle(odometer.getRadius(), odometer.getWidth(), angleToTurn), true);
+		rightMotor.rotate(convertAngle(odometer.getRadius(), odometer.getWidth(), angleToTurn), false);
 
 	}
 
@@ -232,8 +226,8 @@ public class Navigation {
 		leftMotor.setSpeed(FAST);
 		rightMotor.setSpeed(FAST);
 		
-		leftMotor.rotate(-convertAngle(2.1, 14.6, angle), true);
-		rightMotor.rotate(convertAngle(2.1, 14.6, angle), false);
+		leftMotor.rotate(-convertAngle(odometer.getRadius(), odometer.getWidth(), angle), true);
+		rightMotor.rotate(convertAngle(odometer.getRadius(), odometer.getWidth(), angle), false);
 	}
 
 	/*
@@ -250,5 +244,15 @@ public class Navigation {
 	// rotate
 	private static int convertDistance(double radius, double distance) {
 		return (int) ((distance * 180.0) / (Math.PI * radius));
+	}
+	
+	//calculate the relative angle from the robot to a given point
+	public double angleToPoint(double x, double y)
+	{
+		double minAng = (Math.atan2(y - odometer.getY(), x - odometer.getX())) * (180.0 / Math.PI);
+		if (minAng < 0) {
+			minAng += 360.0;
+		}
+		return minAng;
 	}
 }

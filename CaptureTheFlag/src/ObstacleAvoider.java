@@ -16,9 +16,9 @@ public class ObstacleAvoider implements TimerListener {
 	private float distance;
 	private static final int safeDistance = 30;
 	private static int direction;
-	private static int path = 0;	//0 means no available path, 1 means left, 2 means right
-	public static boolean atSide = false;
-	public int USSENSOR_MOTOR_SPEED = 60;
+	private static int path;	//0 means no available path, 1 means left, 2 means right
+	public static boolean atSide;
+	public int USSENSOR_MOTOR_SPEED = 75;
 	int bottomLeftX;
 	int bottomLeftY;
 	int topRightX;
@@ -34,23 +34,25 @@ public class ObstacleAvoider implements TimerListener {
 		this.topRightX = coords[2]*30;
 		this.topRightY = coords[3]*30;
 		usMotor.setSpeed(USSENSOR_MOTOR_SPEED);
+		this.atSide = false;
+		this.path = 0;
 	}
 
-	public void avoidObstacles() {
+	public void avoidObstaclesTowards() {
 
-		navigator.turnTo(90,true);
+		navigator.turnTo(0,true);
 		currentX = odometer.getX();
 		currentY = odometer.getY();
 
 		while (destReached()) {
 			if(!atSide)
 			{
-				if(odometer.getY() > 180)
+				if(odometer.getY() > topRightY - 30)
 				{
 					navigator.turn(-90);
 					atSide = true;
 				}
-				if(odometer.getX() > 180)
+				if(odometer.getX() > topRightX - 30)
 				{
 					navigator.turn(90);
 					atSide = true;
@@ -160,6 +162,134 @@ public class ObstacleAvoider implements TimerListener {
 		}
 
 	}
+	
+	// on the way back after catching the block
+	public void avoidObstaclesReturn() {
+
+		navigator.turnTo(270,true);
+		currentX = odometer.getX();
+		currentY = odometer.getY();
+
+		while (destReached()) {
+			if(!atSide)
+			{
+				if(odometer.getY() < topRightY + 30)
+				{
+					navigator.turn(-90);
+					atSide = true;
+				}
+				if(odometer.getX() < topRightX + 30)
+				{
+					navigator.turn(90);
+					atSide = true;
+				}
+			}
+			if(!atSide)
+			{
+				if(path == 1)
+				{
+					navigator.turn(90);
+					path = 0;
+				}
+				if(path == 2)
+				{
+					navigator.turn(-90);
+					path = 0;
+				}
+			}
+			direction = (((int)odometer.getAng()+45)%360)/90;	//0,1,2,3 means E,N,W,S respectively
+			distance = usPoller.getFilteredData();
+			display.print("Distance: ", distance + "", 4);
+			if (distance > safeDistance) {
+				switch(direction)
+				{
+					case 0:
+						navigator.travelTo(currentX + OFFSET, currentY);
+						currentX = currentX + OFFSET;
+						break;
+					case 1:
+						navigator.travelTo(currentX, currentY + OFFSET);
+						currentY = currentY + OFFSET;
+						break;
+					case 2:
+						navigator.travelTo(currentX - OFFSET, currentY);
+						currentX = currentX - OFFSET;
+						break;
+					case 3:
+						navigator.travelTo(currentX, currentY - OFFSET);
+						currentY = currentY - OFFSET;
+						break;
+				}
+			} else {
+				switch(direction)
+				{
+					case 0:
+						navigator.turn(90);
+						distance = usPoller.getFilteredData();
+						if (distance < safeDistance)
+						{
+							navigator.turn(180);	
+							distance = usPoller.getFilteredData();
+							if (distance < safeDistance)
+							{
+								navigator.turn(-90);	
+							}
+							break;
+						}
+						else
+							break;
+					case 1:
+						navigator.turn(-90);
+						distance = usPoller.getFilteredData();
+						if (distance < safeDistance)
+						{
+							navigator.turn(180);	
+							distance = usPoller.getFilteredData();
+							if (distance < safeDistance)
+							{
+								navigator.turn(90);	
+							}
+							break;
+						}
+						else
+							break;
+					case 2:
+						navigator.turn(-90);
+						distance = usPoller.getFilteredData();
+						if (distance < safeDistance)
+						{
+							navigator.turn(180);	
+							distance = usPoller.getFilteredData();
+							if (distance < safeDistance)
+							{
+								navigator.turn(90);	
+							}
+							break;
+						}
+						else
+							break;
+					case 3:
+						navigator.turn(90);
+						distance = usPoller.getFilteredData();
+						if (distance < safeDistance)
+						{
+							navigator.turn(180);	
+							distance = usPoller.getFilteredData();
+							if (distance < safeDistance)
+							{
+								navigator.turn(-90);	
+							}
+							break;
+						}
+						else
+							break;
+				}
+			}
+		}
+
+	}
+	
+	
 
 	public static void seekPath()
 	{
@@ -186,6 +316,31 @@ public class ObstacleAvoider implements TimerListener {
 			path = 0;
 	}
 	
+	public static void seekPathReturn()
+	{
+		if(!atSide)
+		{
+			if(direction == 2)
+			{
+				usMotor.rotate(100);
+				if(usPoller.getFilteredData() > safeDistance)
+					path = 1;
+				usMotor.rotate(-100);
+			}
+			else if(direction == 3)
+			{
+				usMotor.rotate(-100);
+				if(usPoller.getFilteredData() > safeDistance)
+					path = 2;
+				usMotor.rotate(100);
+			}
+			else
+				path = 0;
+		}
+		else
+			path = 0;
+	}
+	
 	//set to false when destination is reached
 	private boolean destReached()
 	{
@@ -197,10 +352,6 @@ public class ObstacleAvoider implements TimerListener {
 		  }
 		else
 			return true;
-	}
-
-	private boolean searchForObject() {
-		return false;
 	}
 
 	public void timedOut() {
